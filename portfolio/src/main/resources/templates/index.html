@@ -1,0 +1,56 @@
+<!--
+ *******************************************************************************
+ * Project: Portfolio Site
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2024 GearBlob All rights reserved.
+ *******************************************************************************
+-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    
+    <!-- insert head -->
+    <head th:replace="~{fragment/head :: head}"/>
+
+    <!-- start of body -->
+    <body>
+        <!-- start of main -->
+        <main >
+            <!-- IDE Container -->
+            <section id="ide-container">
+                <!-- IDE header -->
+                <header id="ide-header">
+                    <div id="ide-title-container" class="flex-div-center">
+                        <h1 id="ide-title">Collin's Integrated Development Environment</h1>
+                    </div>
+                    
+                    <ul id="ide-header-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Resume</a></li>
+                        <li><a href="#">Work</a></li>
+                        <li><a href="#">This Site</a></li>
+                    </ul>
+                </header>
+                <!-- end IDE header -->
+               
+                <!-- IDE sidebar -->
+                <section id="ide-sidebar">
+                    <ul id="ide-sidebar-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Resume</a></li>
+                        <li><a href="#">Work</a></li>
+                        <li><a href="#">This Site</a></li>
+                    </ul>
+                </section>
+                <!-- end IDE sidebar -->
+            </section>
+            <!-- end IDE Container -->
+        </main>
+        <!-- end of main -->
+    </body>
+    <!-- end of body -->
+
+</html>
