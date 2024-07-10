@@ -8,9 +8,23 @@
  *******************************************************************************
 */
 
+const sections = [
+    "git-section",
+    "readme-section",
+    "resume-section",
+    "profile-section",
+    "settings-section"
+];
+
 class IDE {
 
     constructor() {
+
+        // make sure we know what is currently opened on the screen
+        this.openedSection = null;
+
+        // initalize the js tree with no data
+        this.initializeJSTree();
 
         // setup button functionality
         this.buttonDetails = [
@@ -55,9 +69,6 @@ class IDE {
         //$('#replaceable-content-container').on('mouseup', this.mouseUp.bind(this));
         //$('#replaceable-content-container').on('mousemove', this.mouseMove.bind(this));
         //$('#mini-map-viewport').on('mousedown', this.mouseDown.bind(this));
-
-        // Ensure the minimap viewport syncs initially
-        //$('#replaceable-content-container').trigger(new Event('scroll'));
 
         // Lastly initialize by opening the home content
         this.openHomeContent();
@@ -119,8 +130,12 @@ class IDE {
             $('#' + id).toggleClass('open closed');
             $('#' + id + '-panel').toggleClass('open closed');
         }
+        // set the openedSection
+        this.setOpenedSection(id);
         // update the mini map
         this.updateMiniMap();
+        // update the jstree primary panel contents
+        this.jsTreeGetData();
     }
 
     close(id) {
@@ -133,6 +148,10 @@ class IDE {
     closeOpenedSection() {
         let openedID = $('#main-editor-section').find('.open').attr('id');
         this.close(openedID);
+    }
+
+    setOpenedSection(section) {
+        this.openedSection = section;
     }
 
     /* MINI MAP */
@@ -191,6 +210,52 @@ class IDE {
         }
     }
     /* MINI MAP */
+
+    /* JS TREE */
+    jsTreeGetData() {
+        $.ajax({
+            url: 'http://localhost:8080/jstreedata/' + this.openedSection,
+            type: 'GET',
+            dataType: 'json',
+            success: this.updateJSTree.bind(this),
+            error: function(xhr, status, error) {
+                // Handle any errors that occurred during the request
+                console.error('Error:', error);
+                $('#result').html('<p>An error occurred while fetching data.</p>');
+            }
+        });
+    }
+
+    initializeJSTree() {
+        $('#primary-panel-jstree')
+        // allow single click nodes
+        .on('select_node.jstree', function(event, data) {
+            event.preventDefault;
+            if (data.event && data.node.a_attr.class.includes('folder-node')) {
+                this.toggleNode(data.node);
+            }
+        }.bind(this))
+        // create instance with no data
+        .jstree({
+            'core': {
+                'data': []
+            }
+        });
+    }
+
+    updateJSTree(newData) {
+        if (newData) {
+            $('#primary-panel-jstree').jstree(true).settings.core.data = [newData];
+            $('#primary-panel-jstree').jstree().refresh();
+        }
+    }
+
+    toggleNode(node) {
+        $('#primary-panel-jstree').jstree('toggle_node', node);
+        $('#primary-panel-jstree').jstree('deselect_all', node);
+    }
+
+    /* JS TREE */
 
 }
 
