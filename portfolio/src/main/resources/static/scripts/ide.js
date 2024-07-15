@@ -244,6 +244,11 @@ class IDE {
 
     /* JS TREE */
     jsTreeGetData() {
+        // just clear the tree if we dont have opened section
+        if (!this.openedSection) {
+            clearJSTree();
+            return;
+        }
         $.ajax({
             url: 'http://localhost:8080/jstreedata/' + this.openedSection,
             type: 'GET',
@@ -279,6 +284,10 @@ class IDE {
             $('#primary-panel-jstree').jstree(true).settings.core.data = [newData];
             $('#primary-panel-jstree').jstree().refresh();
         }
+    }
+
+    clearJSTree() {
+        this.updateJSTree($.noop);
     }
 
     toggleNode(node) {
@@ -338,7 +347,12 @@ class IDE {
         // close the section
         this.close(sectionData.section);
         if (this.tabs.length == 0) {
+            // reset the opened section
             this.openedSection = "";
+            // clear the minimap
+            this.updateMiniMap();
+            // clear js tree
+            this.clearJSTree();
         }
         if (this.openedSection == sectionData.section) {
             // open the next closest tab
