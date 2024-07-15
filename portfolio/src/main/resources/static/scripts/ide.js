@@ -8,14 +8,6 @@
  *******************************************************************************
 */
 
-const sections = [
-    "git-section",
-    "readme-section",
-    "resume-section",
-    "profile-section",
-    "settings-section"
-];
-
 class IDE {
 
     constructor() {
@@ -23,35 +15,55 @@ class IDE {
         // make sure we know what is currently opened on the screen
         this.openedSection = null;
 
+        // create list to hold tabs
+        this.tabs = [];
+
         // initalize the js tree with no data
         this.initializeJSTree();
 
+        // set up all the sections
+        this.sectionDetails = [
+            {id: 'git',      section: "git-section",      title: "Git",      tabID: 'git-tab'},
+            {id: 'readme',   section: "readme-section",   title: "README",   tabID: 'readme-tab'},
+            {id: 'resume',   section: "resume-section",   title: "Resume",   tabID: 'resume-tab'},
+            {id: 'profile',  section: "profile-section",  title: "Profile",  tabID: 'profile-tab'},
+            {id: 'settings', section: "settings-section", title: "Settings", tabID: 'settings-tab'}
+        ];
+
         // setup button functionality
         this.buttonDetails = [
+            // left header navbar
             {selector: '#file', event: this.leftHeaderNavButtonHandler.bind(this)},
             {selector: '#edit', event: this.leftHeaderNavButtonHandler.bind(this)},
             {selector: '#view', event: this.leftHeaderNavButtonHandler.bind(this)},
-            {selector: '#run', event: this.leftHeaderNavButtonHandler.bind(this)},
+            {selector: '#run',  event: this.leftHeaderNavButtonHandler.bind(this)},
             {selector: '#help', event: this.leftHeaderNavButtonHandler.bind(this)},
-
-            {selector: '#toggle-primary-panel', event: this.togglePrimaryPanel.bind(this)},
+            // right header navbar
+            {selector: '#code-cube',              event: this.rightHeaderNavButtonHandler.bind(this)},
+            {selector: '#customize-layout',       event: this.rightHeaderNavButtonHandler.bind(this)},
+            {selector: '#toggle-primary-panel',   event: this.togglePrimaryPanel.bind(this)},
             {selector: '#toggle-secondary-panel', event: this.rightHeaderNavButtonHandler.bind(this)},
-            {selector: '#customize-layout', event: this.rightHeaderNavButtonHandler.bind(this)},
-            {selector: '#code-cube', event: this.rightHeaderNavButtonHandler.bind(this)},
-
-            {selector: '#home', event: this.homeButtonHandler.bind(this)},
-            {selector: '#git', event: this.sidebarButtonHandler.bind(this)},
-            {selector: '#resume', event: this.sidebarButtonHandler.bind(this)},
+            // sidebar
+            {selector: '#git',      event: this.sidebarButtonHandler.bind(this)},
+            {selector: '#readme',     event: this.sidebarButtonHandler.bind(this)},
+            {selector: '#resume',   event: this.sidebarButtonHandler.bind(this)},
+            {selector: '#profile',  event: this.sidebarButtonHandler.bind(this)},
             {selector: '#settings', event: this.sidebarButtonHandler.bind(this)}
         ];
         // call the setup buttons function
         this.setupButtons();
 
+        // setup tabs and functionality
+        this.tabDetails = [
+            {selector: '#git-tab',      event: this.tabSelect.bind(this)},
+            {selector: '#readme-tab',   event: this.tabSelect.bind(this)},
+            {selector: '#resume-tab',   event: this.tabSelect.bind(this)},
+            {selector: '#profile-tab',  event: this.tabSelect.bind(this)},
+            {selector: '#settings-tab', event: this.tabSelect.bind(this)}
+        ];
 
         // primary panel resizable
         $(".resizable").resizable();
-        //$('.ui-resizable-e').removeClass('ui-resizable-handle');
-        //$('.ui-resizable-s').removeClass('ui-resizable-handle');
 
         // mini map details
         this.miniMap = [{
@@ -70,8 +82,8 @@ class IDE {
         //$('#replaceable-content-container').on('mousemove', this.mouseMove.bind(this));
         //$('#mini-map-viewport').on('mousedown', this.mouseDown.bind(this));
 
-        // Lastly initialize by opening the home content
-        this.openHomeContent();
+        // Lastly initialize by opening the home/readme content
+        this.createTab("readme-section");
     }
 
     setupButtons() {
@@ -80,20 +92,24 @@ class IDE {
         });
     }
 
-    // button click handlers
-    homeButtonHandler(event) {
-        event.preventDefault();
-        this.openHomeContent();
+    getSection(section) {
+        let sectionDetails = null;
+        this.sectionDetails.forEach(sectionInfo => {
+            if (sectionInfo.section == section) {
+                sectionDetails = sectionInfo;
+            }
+        });
+        return sectionDetails;
     }
 
-    openHomeContent() {
-        if ($('#readme-section').hasClass('open')) {
-            return;
-        }
-        // close opened section
-        this.closeOpenedSection();
-        // toggle the home page as needed
-        this.open('readme-section');
+    getSectionByTabID(tabID) {
+        let sectionDetails = null;
+        this.sectionDetails.forEach(sectionInfo => {
+            if (sectionInfo.tabID == tabID) {
+                sectionDetails = sectionInfo;
+            }
+        });
+        return sectionDetails;
     }
 
     leftHeaderNavButtonHandler(event) {
@@ -111,24 +127,30 @@ class IDE {
     sidebarButtonHandler(event) {
         event.preventDefault();
         let buttonID = $(event.target).attr('id') + '-section';
-        let openedID = $('#main-editor-section').find('.open').attr('id');
-        if (buttonID == openedID) {
+        // get the opened section
+        let openedSection = this.openedSection;
+        if (openedSection && (buttonID == openedSection)) {
             return;
         }
-        // close opened section
-        this.closeOpenedSection();
-        // open the section clicked
-        this.open(buttonID);
+        // create the tab
+        this.createTab(buttonID);
     }
 
     togglePrimaryPanel() {
-        $("#primary-panel").toggleClass('open closed');
+        $("#primary-panel").toggleClass('open');
+        $("#primary-panel").toggleClass('closed');
+    }
+
+    closeAndOpen(id) {
+        // close opened section
+        this.closeOpenedSection();
+        // open the section passed in
+        this.open(id);
     }
 
     open(id) {
         if ($('#' + id).hasClass('closed')) {
-            $('#' + id).toggleClass('open closed');
-            $('#' + id + '-panel').toggleClass('open closed');
+            this.closeOrOpen(id);
         }
         // set the openedSection
         this.setOpenedSection(id);
@@ -140,14 +162,23 @@ class IDE {
 
     close(id) {
         if ($('#' + id).hasClass('open')) {
-            $('#' + id).toggleClass('open closed');
-            $('#' + id + '-panel').toggleClass('open closed');
+            this.closeOrOpen(id);
         }
     }
 
+    closeOrOpen(id) {
+        $('#' + id).toggleClass('open');
+        $('#' + id).toggleClass('closed');
+        $('#' + id + '-panel').toggleClass('open');
+        $('#' + id + '-panel').toggleClass('closed');
+    }
+
     closeOpenedSection() {
-        let openedID = $('#main-editor-section').find('.open').attr('id');
-        this.close(openedID);
+        // check if something is currently opened
+        if (this.openedSection) {
+            // close opened section
+            this.close(this.openedSection);
+        }
     }
 
     setOpenedSection(section) {
@@ -254,9 +285,118 @@ class IDE {
         $('#primary-panel-jstree').jstree('toggle_node', node);
         $('#primary-panel-jstree').jstree('deselect_all', node);
     }
+    /* end JS TREE */
 
-    /* JS TREE */
+    /* tab management */
+    createTab(section) {
+        // get the section from the sections object to create the button with
+        let sectionData = this.getSection(section);
+        if (this.sectionTabExists(sectionData)) {
+            // open the tab if its not open already
+            this.closeAndOpen(sectionData.section);
+            this.setActiveTab(sectionData.tabID);
+            return;
+        }
+        // remove the active tab
+        $('.tab-links.active').removeClass('active');
+        // create the new tab and set to active
+        $('#tabsSection')
+            .append('<Button id=' + sectionData.tabID + ' class="tab-links active">' + sectionData.title + 
+                '<span class="tab-close material-symbols-rounded">close</span></Button>');
+        // add button functionality
+        $('#' + sectionData.tabID).on('click', this.tabSelect.bind(this));
+        // add tab close functionality
+        $('.tab-close').on('click', this.closeTab.bind(this));
+        // check if we need to then open the section
+        this.closeAndOpen(sectionData.section);
+        // lastly add the tab to the js list of tabs
+        this.tabs.push(sectionData);
+    }
 
+    sectionTabExists(sectionData) {
+        if (this.tabs.length > 0) {
+            return this.tabs.indexOf(sectionData) != -1;
+        }
+    }
+
+    // a few things happen when we close tab, 
+    // close the tab,
+    // remove the tab from the list of tabs,
+    // close the section of that tab if its open,
+    // if we closed the tab of an opened section, open closest tab
+    closeTab(event) {
+        event.preventDefault;
+        let closeTab = $(event.target).parent();
+        // get the sectiondata from the tab
+        let sectionData = this.getSectionByTabID(closeTab[0].id);
+        // find the index of the tab
+        let indexOfCloseTab = this.tabs.indexOf(sectionData);
+        // remove the tab
+        $(closeTab).remove();
+        // remove the tab from the list of tabs        
+        this.removeTabFromList(sectionData);
+        // close the section
+        this.close(sectionData.section);
+        if (this.tabs.length == 0) {
+            this.openedSection = "";
+        }
+        if (this.openedSection == sectionData.section) {
+            // open the next closest tab
+            this.openClosestTab(indexOfCloseTab);
+        }
+    }
+
+    setActiveTab(tabID) {
+        let activeTab = $('.tab-links.active')[0];
+        if (activeTab && (tabID == activeTab.id)) {
+            return;
+        }
+        $(activeTab).removeClass('active');
+        $('#' + tabID).addClass('active');
+    }
+
+    tabSelect(event) {
+        event.preventDefault;
+        // get selected tabs id
+        let tabSelectedID = event.target.id;
+        // set it as the active tab
+        this.setActiveTab(tabSelectedID);
+        // get the section to open it
+        let sectionData = this.getSectionByTabID(tabSelectedID);
+        this.closeAndOpen(sectionData.section);
+    }
+
+    removeTabFromList(tab) {
+        let indexOfCloseTab = this.tabs.indexOf(tab);
+        if (indexOfCloseTab == -1) {
+            return;
+        }
+        // splice or remove the indexed tab
+        this.tabs.splice(indexOfCloseTab, 1);
+    }
+
+    openClosestTab(indexOfCloseTab) {
+        let openTab = null;
+        let openTabCount = this.tabs.length;
+        if (openTabCount == 0) {
+            return;
+        } else if (openTabCount == 1) {
+            openTab = this.tabs[0];
+            this.open(openTab.section);
+        } else {
+            // if last index add one because we remove one 
+            // to get the left tab in the list
+            if (indexOfCloseTab == 0) {
+                indexOfCloseTab++;
+            }
+            // get previous index
+            openTab = this.tabs[--indexOfCloseTab];
+            this.closeAndOpen(openTab.section);
+        }
+        // finally set the new active tab
+        this.setActiveTab(openTab.tabID);
+    }
+    /* end tab management */
 }
 
 // Initialize the IDE class when the document is ready

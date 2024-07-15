@@ -8,6 +8,23 @@
  *******************************************************************************
 */
 
+/* Search by sections */
+/*
+    generic classes
+    tool-tips
+    icons
+    flex content
+    ascii art
+    ide container
+    header
+    sidebar
+    primary panel
+    tabs
+    main editor
+    mini map
+    jstree
+*/
+
 :root {
 
     /* colors */
@@ -20,11 +37,12 @@
     --dark-gray: #2c3440;
     --dark: #222831;
     --darker: #181c22;
+    --less-black: #13161c;
     --black: #0d0f13;
 
     --light-blue: #76ABAE;
     --light-green: #8EDCAA;
-    --purple: #df8dff;
+    --purple: #b702ff;
     --red: #C23535;
 
     --black-transparent: #00000010;
@@ -58,6 +76,7 @@ button {
     border-radius: 5px;
 }
 
+/* generic classes */
 .open {
     display: '';
 }
@@ -87,6 +106,12 @@ button {
     text-wrap: nowrap;
     overflow: auto;
 }
+
+.scrollbar {
+    scrollbar-color: var(--dark-gray) var(--darker);
+    scrollbar-width: thin;
+}
+/* end generic classes */
 
 /* tooltips */
 .tool-tip {
@@ -157,15 +182,25 @@ button {
     0% {   opacity: 0; }
     100% { opacity: 1; }
 }
+/* end tool-tips */
 
 /* icons */
 .material-symbols-outlined {
     font-variation-settings:
-    'FILL' 0,
-    'wght' 200,
-    'GRAD' 0,
-    'opsz' 24;
+        'FILL' 0,
+        'wght' 200,
+        'GRAD' 0,
+        'opsz' 24;
     color: var(--light-gray);
+}
+
+.tab-close.material-symbols-rounded {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 300,
+    'GRAD' 0,
+    'opsz' 20;
+  color: var(--light-gray);
 }
 
 .icon {
@@ -173,23 +208,35 @@ button {
     height: 30px;
     padding-right: 5px;
 }
+/* end icons */
 
-.flex-div-center {
+/* flex content */
+.row,
+.column,
+.flex-center {
     display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.flex-center {
     align-items: center;
     justify-content: center;
 }
 
+.column {
+    flex-direction: column;
+}
+/* end flex content */
+
+/* ascii art */
 .ascii-art {
     font-family: monospace;
     white-space: pre;
 }
+/* end ascii art */
 
-.scrollbar {
-    scrollbar-color: var(--dark-gray) var(--darker);
-    scrollbar-width: thin;
-}
-
+/* ide container 'canvas' */
 #ide-container {
     width: 100%;
     height: 90vh;
@@ -197,6 +244,7 @@ button {
     background-color: var(--background-color);
 }
 
+/* header section */
 #header {
     width: 100%;
     height: 5vh;
@@ -207,12 +255,6 @@ button {
     align-items: center;
     font-size: 0.9rem;
     padding: 0px 10px;
-}
-
-#title {
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--light);
 }
 
 #header-nav-left,
@@ -240,11 +282,20 @@ button {
 }
 
 #header-nav-right button:hover,
-#sidebar button:hover{
+#sidebar button:hover {
     color: var(--light);
 }
 
+#title {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--light);
+}
+/* end header section */
+
 /* MAIN CONTENT */
+
+/*container */
 #main-content {
     width: 100%;
     height: 95vh;
@@ -252,6 +303,7 @@ button {
     flex-direction: row;
 }
 
+/* sidebar */
 #sidebar {
     width: 100px;
     height: 100%;
@@ -265,7 +317,9 @@ button {
 #sidebar-nav .active {
     border-left: solid 2px var(--light);
 }
+/* end sidebar */
 
+/* primary panel */
 #primary-panel {
     width: 13%;
     height: 100%;
@@ -274,6 +328,7 @@ button {
     flex-direction: column;
     font-size: 12px;
     border: none;
+    overflow: hidden;
 }
 
 .primary-panel-container {
@@ -287,9 +342,66 @@ button {
     margin: auto;
     overflow: auto;
 }
+/* end primary panel */
 
-#main-editor-section {
+/* tabs and main editor */
+#tabs-main-editor-container {
     flex-grow: 1;
+    height: 100%;
+}
+/* end tabs and main editor */
+
+/* tabs */
+#tabsSection {
+    background-color: var(--darker);
+    height: 40px;
+}
+
+.tab-links {
+    padding: 0px 10px;
+    height: 100%;
+    border-radius: 0;
+    font-family: var(--font-header);
+    color: var(--white);
+    position: relative;
+    border-right: solid 1px var(--less-black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.tab-links:hover {
+    background-color: var(--dark-gray);
+}
+
+.tab-links:hover::after {
+    content: '';
+    background-color: var(--light);
+}
+
+.tab-links::after {
+    height: 2px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-size: 12px;
+}
+
+.tab-links.active {
+    background-color: var(--dark);
+}
+
+.tab-links.active::after {
+    content: '';
+    background-color: var(--light-green);
+}
+/* end tabs */
+
+/* main editor */
+#main-editor-section {
+    width: 100%;
     height: 100%;
     padding: 0px 10px;
     display: flex;
@@ -310,8 +422,9 @@ button {
     bottom: 0;
     text-wrap: nowrap;
 }
+/* end main editor */
 
-/* Mini Map */
+/* mini map */
 #mini-map-container {
     width: 10%;
     max-width: 200px;
@@ -345,8 +458,9 @@ button {
     background-color: var(--black-transparent);
     width: 100%;
 }
+/* end mini map */
 
-/* JSTree */
+/* jstree */
 .jstree-node {
     border-radius: 2px;
 }
@@ -374,5 +488,4 @@ button {
 .jstree-anchor > .jstree-themeicon {
     margin-right: 10px;
 }
-
-/* README Section (home page) */
+/* end jstree */

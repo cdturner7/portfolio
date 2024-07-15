@@ -62,7 +62,7 @@
         <div id="main-content">
             <!-- IDE sidebar -->
             <section id="sidebar" class="dark-gray">
-                <button id="home" class="material-symbols-outlined tool-tip">
+                <button id="readme" class="material-symbols-outlined tool-tip">
                     home
                     <span class="tool-tip-text-right">README page</span>
                 </button>
@@ -81,46 +81,59 @@
             </section>
             <!-- end IDE sidebar -->
 
-            <!-- IDE primary side panel -->
-            <section id="primary-panel" class="darker resizable scrollbar ui-widget-content">
-                <div id="primary-panel-jstree"></div>
-            </section>
-            <!-- end primary side panel -->
+            <!-- main replacable content area -->
+            <div class="row">
+                <!-- IDE primary side panel -->
+                <section id="primary-panel" class="darker resizable scrollbar ui-widget-content">
+                    <div id="primary-panel-jstree"></div>
+                </section>
+                <!-- end primary side panel -->
 
-            <!-- start main editor section -->
-            <section id="main-editor-section">
-                <!-- start of replaceabl content -->
-                <div id="replaceable-content-container" class="scrollbar">
-                    <div id="readme-section" class="replaceable-content closed">
-                        <div th:replace="~{fragment/readme :: readme}"/>
-                    </div>
-                    <div id="git-section" class="replaceable-content closed">
-                        <div th:replace="~{fragment/git :: git}"/>
-                    </div>
-                    <div id="resume-section" class="replaceable-content closed">
-                        <div th:replace="~{fragment/resume :: resume}"/>
-                    </div>
-                    <div id="settings-section" class="replaceable-content closed">
-                        <div th:replace="~{fragment/settings :: settings}"/>
-                    </div>
+                <!-- tabs and main editor sections -->
+                <div id="tabs-main-editor-container" class="column">
+                    
+                    <!-- tabs section -->
+                    <section id="tabsSection" class="row">
+                    </section>
+                    <!-- end tabs section -->
 
-                    <!-- start of scroll bar mini map -->
-                    <div id="mini-map-container">
-                        <div id="mini-map">
-                            <div id="mini-map-content">
-                                <!-- mini-map content will be cloned here -->
+                    <!-- start main editor section -->
+                    <section id="main-editor-section">
+                        <!-- start of replacable content -->
+                        <div id="replaceable-content-container" class="scrollbar">
+                            <div id="readme-section" class="replaceable-content closed">
+                                <div th:replace="~{fragment/readme :: readme}"/>
                             </div>
-                            <div id="mini-map-viewport"></div>
-                        </div>
-                    </div>
-                </div>
+                            <div id="git-section" class="replaceable-content closed">
+                                <div th:replace="~{fragment/git :: git}"/>
+                            </div>
+                            <div id="resume-section" class="replaceable-content closed">
+                                <div th:replace="~{fragment/resume :: resume}"/>
+                            </div>
+                            <div id="settings-section" class="replaceable-content closed">
+                                <div th:replace="~{fragment/settings :: settings}"/>
+                            </div>
 
-            </section>
-            <!-- start main editor section -->
+                            <!-- start of scroll bar mini map -->
+                            <div id="mini-map-container">
+                                <div id="mini-map">
+                                    <div id="mini-map-content"></div>
+                                    <div id="mini-map-viewport"></div>
+                                </div>
+                            </div>
+                            <!-- start of scroll bar mini map -->
+                        </div>
+                        <!-- end of replacable content -->
+                    </section>
+                    <!-- end main editor section -->
+                </div>
+                <!-- end of tabs and main editor sections -->
+            </div>
+            <!-- end main replacable content area -->
 
             <!-- start bottom panel -->
             <section id="secondary-panel" class="dark-gray resizable closed">
-                <!-- nothing yet -->
+                
             </section>
             <!-- end bottom panel -->
 
