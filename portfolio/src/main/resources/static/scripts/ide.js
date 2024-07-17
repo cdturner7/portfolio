@@ -63,7 +63,13 @@ class IDE {
         ];
 
         // primary panel resizable
-        $(".resizable").resizable();
+        $(".resizableX").resizable({
+            handles: 'e, w'
+        });
+
+        $(".resizableY").resizable({
+            handles: 'n, s'
+        });
 
         // mini map details
         this.miniMap = [{
