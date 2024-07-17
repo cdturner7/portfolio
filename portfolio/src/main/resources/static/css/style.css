@@ -45,7 +45,7 @@
     --purple: #b702ff;
     --red: #C23535;
 
-    --black-transparent: #00000010;
+    --black-transparent: #0000004D;
     
     /* fonts */
     --font-default: 'Poppins', sans-serif;
@@ -406,6 +406,7 @@ button {
     padding: 0px 10px;
     display: flex;
     flex-direction: row;
+    position: relative;
 }
 
 #replaceable-content-container {
@@ -433,7 +434,7 @@ button {
     align-items: center;
     top: 10%;
     left: 88%;
-    position: sticky;
+    position: absolute;
     height: 80%;
 }
 
@@ -457,6 +458,7 @@ button {
     cursor: grab;
     background-color: var(--black-transparent);
     width: 100%;
+    overflow: none;
 }
 /* end mini map */
 

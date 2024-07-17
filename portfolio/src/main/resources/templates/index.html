@@ -93,12 +93,11 @@
                 <div id="tabs-main-editor-container" class="column">
                     
                     <!-- tabs section -->
-                    <section id="tabsSection" class="row">
-                    </section>
+                    <section id="tabsSection" class="row"></section>
                     <!-- end tabs section -->
 
                     <!-- start main editor section -->
-                    <section id="main-editor-section">
+                    <section id="main-editor-section" class="row">
                         <!-- start of replacable content -->
                         <div id="replaceable-content-container" class="scrollbar">
                             <div id="readme-section" class="replaceable-content closed">
@@ -113,17 +112,17 @@
                             <div id="settings-section" class="replaceable-content closed">
                                 <div th:replace="~{fragment/settings :: settings}"/>
                             </div>
-
-                            <!-- start of scroll bar mini map -->
-                            <div id="mini-map-container">
-                                <div id="mini-map">
-                                    <div id="mini-map-content"></div>
-                                    <div id="mini-map-viewport"></div>
-                                </div>
-                            </div>
-                            <!-- start of scroll bar mini map -->
                         </div>
                         <!-- end of replacable content -->
+                        
+                        <!-- start of scroll bar mini map -->
+                        <div id="mini-map-container">
+                            <div id="mini-map">
+                                <div id="mini-map-content"></div>
+                                <div id="mini-map-viewport"></div>
+                            </div>
+                        </div>
+                        <!-- end of scroll bar mini map -->
                     </section>
                     <!-- end main editor section -->
                 </div>

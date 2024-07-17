@@ -76,11 +76,14 @@ class IDE {
         this.miniMapContent = $('#mini-map-content')[0];
         this.miniMapViewport = $('#mini-map-viewport')[0];
 
-        // adding scrolling event listener
-        //$('#replaceable-content-container').on('scroll', this.updateViewPort.bind(this));
-        //$('#replaceable-content-container').on('mouseup', this.mouseUp.bind(this));
-        //$('#replaceable-content-container').on('mousemove', this.mouseMove.bind(this));
-        //$('#mini-map-viewport').on('mousedown', this.mouseDown.bind(this));
+        // adding scrolling event listener for main content and mini map
+        this.isDragging = 'false';
+        $('#replaceable-content-container').on('scroll', this.updateViewPort.bind(this));
+        $('#mini-map-viewport').draggable(
+            {axis: "y" }, 
+            {drag: this.scrollContent.bind(this)},
+            {containment: this.miniMapContent}
+        );
 
         // Lastly initialize by opening the home/readme content
         this.createTab("readme-section");
@@ -187,58 +190,43 @@ class IDE {
 
     /* MINI MAP */
     updateMiniMap() {
-        $('#mini-map-content').html(this.mainContent.innerHTML);
-        this.updateViewPort();
+        this.miniMapContent.innerHTML= this.mainContent.innerHTML;
+        // remove ids of mini map content just in case of crossing webs
+        $('#mini-map-content div').removeAttr('id');
+        this.updateViewPort(null);
     }
 
-    // scroll event handler
+    // scroll event handler for updating the 
+    // viewport when scrolling main content
     updateViewPort() {
+        if (this.isDragging == 'true') {
+            this.isDragging = 'false';
+            return;
+        }
         // get the main content details
         const contentHeight = this.mainContent.scrollHeight;
-        const viewportHeight = this.mainContent.clientHeight;
+        let viewportHeight = this.mainContent.clientHeight;
         const scrollTop = this.mainContent.scrollTop;
-
-        const miniMapHeight = this.miniMapContent.scrollHeight;
-        const miniMapViewportHeight = viewportHeight * (miniMapHeight / contentHeight);
-        const miniMapScrollTop = scrollTop * (miniMapHeight / contentHeight);
-
+        // get the viewport percentage
+        const viewportPercentage = viewportHeight / contentHeight;
+        if (viewportHeight > 1) {
+            viewportHeight = 1;
+        }
+        // update the mini map content height
+        const miniMapContentHeight = contentHeight * 0.13;
+        $('#mini-map-content').css('height', miniMapContentHeight + 'px');
+        // get the mini map veiwport height and set scrollTop
+        const miniMapViewportHeight =  miniMapContentHeight * viewportPercentage;
+        const miniMapScrollTop = scrollTop * 0.13;
+        // set the view port height and top based on the main content shown
         this.miniMapViewport.style.height = `${miniMapViewportHeight}px`;
         this.miniMapViewport.style.top = `${miniMapScrollTop}px`;
     }
 
-    // mouse click down event handler
-    mouseDown(event) {
-        event.preventDefault;
-        this.miniMap.isDragging = true;
-        this.miniMap.startY = event.clientY;
-        this.miniMap.startTop = this.miniMapViewport.offsetTop;
-        $('body').style.userSelect = 'none';
-    }
-
-    // mouse up event handler
-    mouseUp(event) {
-        event.preventDefault;
-        this.miniMap.isDragging = false;
-        $('body').style.userSelect = 'auto';
-    }
-
-    // mouse move event handler
-    mouseMove(event) {
-        event.preventDefault;
-        if (this.miniMap.isDragging) {
-            const deltaY = event.clientY - startY;
-            const newTop = startTop + deltaY;
-            const minimapHeight = this.miniMapContent.scrollHeight;
-            const viewportHeight = this.mainContent.clientHeight;
-            const contentHeight = this.mainContent.scrollHeight;
-
-            const scrollRatio = contentHeight / minimapHeight;
-            const newScrollTop = newTop * scrollRatio;
-
-            this.miniMapViewport.style.top = `${newTop}px`;
-            this.miniMapViewport.style.height = `${viewportHeight}px`;
-            this.mainContent.scrollTop = newScrollTop;
-        }
+    scrollContent() {
+        this.isDragging = 'true';
+        let miniMapScrollTop = this.miniMapViewport.offsetTop / 0.13;
+        this.mainContent.scrollTop = miniMapScrollTop;
     }
     /* MINI MAP */
 
