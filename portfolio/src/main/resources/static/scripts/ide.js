@@ -11,6 +11,8 @@
 class IDE {
 
     constructor() {
+        // load custom canvas spinner
+        this.preloader();
 
         // make sure we know what is currently opened on the screen
         this.openedSection = null;
@@ -45,9 +47,9 @@ class IDE {
             {selector: '#toggle-secondary-panel', event: this.rightHeaderNavButtonHandler.bind(this)},
             // sidebar
             {selector: '#git',      event: this.sidebarButtonHandler.bind(this)},
-            {selector: '#readme',     event: this.sidebarButtonHandler.bind(this)},
+            {selector: '#readme',   event: this.sidebarButtonHandler.bind(this)},
             {selector: '#resume',   event: this.sidebarButtonHandler.bind(this)},
-            {selector: '#profile',  event: this.sidebarButtonHandler.bind(this)},
+            {selector: '#profile',  event: this.sidebarAnchorHandler.bind(this)},
             {selector: '#settings', event: this.sidebarButtonHandler.bind(this)}
         ];
         // call the setup buttons function
@@ -91,8 +93,12 @@ class IDE {
             {containment: this.miniMapContent}
         );
 
+        $('#profile-card-resume-button').on('click', function() {
+            this.createTab('resume-section');
+        }.bind(this));
+
         // Lastly initialize by opening the home/readme content
-        this.createTab("readme-section");
+        this.createTab('readme-section');
     }
 
     setupButtons() {
@@ -131,6 +137,14 @@ class IDE {
         event.preventDefault();
         let buttonId = $(event.target).attr('id');
         alert('Button clicked: ' + buttonId);
+    }
+
+    sidebarAnchorHandler(event) {
+        // anchor tags target in event is the child node, 
+        // update the target in the event with the parent node
+        // then call sideBarButtonHandler
+        event.target = event.target.parentElement;
+        this.sidebarButtonHandler(event);
     }
 
     sidebarButtonHandler(event) {
@@ -405,6 +419,39 @@ class IDE {
         this.setActiveTab(openTab.tabID);
     }
     /* end tab management */
+
+    /* preloader and loading page overlay management */
+    preloader() {
+        let preloaderID = '#preloader';
+        let preloaderTitleID = '#preloader-title';
+        // show the preloader section and animation
+        $(preloaderID).show();
+        gsap.fromTo(preloaderID, 
+            { 
+                opacity: 1 
+            },
+            {
+                opacity: 0,
+                display: "none",
+                duration: 1,
+                delay: 3,
+            }
+        );
+        gsap.fromTo(
+            preloaderTitleID,
+            {
+                y: 50,
+                opacity: 0,
+            },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 2,
+                delay: 1,
+            }
+        );
+    }
+    /* end preloader and loading page overall management */
 }
 
 // Initialize the IDE class when the document is ready

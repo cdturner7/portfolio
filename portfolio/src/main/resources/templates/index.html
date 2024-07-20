@@ -32,7 +32,7 @@
             <!-- end ide header nav -->
             <!-- start title of site-->
             <div id="title-container">
-                <h1 id="title">Collin's Integrated Development Environment</h1>
+                <h1 id="title">Collin's Integrated Development Environment (IDE) Portfolio</h1>
             </div>
             <!-- end title of site-->
             <!-- start header right nav -->
@@ -61,23 +61,39 @@
         <!-- start main content -->
         <div id="main-content">
             <!-- IDE sidebar -->
-            <section id="sidebar" class="dark-gray">
-                <button id="readme" class="material-symbols-outlined tool-tip">
-                    home
-                    <span class="tool-tip-text-right">README page</span>
-                </button>
-                <button id="git" class="material-symbols-outlined tool-tip">
-                    conversion_path
-                    <span class="tool-tip-text-right">Git Information</span>
-                </button>
-                <button id="resume" class="material-symbols-outlined tool-tip">
-                    article
-                    <span class="tool-tip-text-right">My Resume</span>
-                </button>
-                <button id="settings" class="material-symbols-outlined tool-tip">
-                    settings
-                    <span class="tool-tip-text-right">Settings</span>
-                </button>
+            <section id="sidebar" class="dark-gray column-space-between">
+                <!-- start sidebar top section -->
+                <div id="sidebar-top">
+                    <button id="readme" class="material-symbols-outlined tool-tip">
+                        home
+                        <span class="tool-tip-text-right">README page</span>
+                    </button>
+                    <button id="git" class="material-symbols-outlined tool-tip">
+                        conversion_path
+                        <span class="tool-tip-text-right">Git Information</span>
+                    </button>
+                    <button id="resume" class="material-symbols-outlined tool-tip">
+                        article
+                        <span class="tool-tip-text-right">My Resume</span>
+                    </button>
+                </div>
+                <!-- end of sidebar top section -->
+
+                <!-- start sidebar bottom section -->
+                <div id="sidebar-bottom">
+                    <button id="settings" class="material-symbols-outlined tool-tip">
+                        settings
+                        <span class="tool-tip-text-right">Settings</span>
+                    </button>
+                    <div id="profile-avatar">
+                        <a id="profile" class="flex-center" href="#">
+                            <img id="profile-icon" th:src="@{/images/headshot.jpg}" alt="collin turner's profile">
+                        </a>
+                        <div th:replace="~{fragment/profile :: profile-hover-card}"/>
+                    </div>
+                    
+                </div>
+                <!-- end of sidebar bottom section -->
             </section>
             <!-- end IDE sidebar -->
 
@@ -112,6 +128,9 @@
                             <div id="settings-section" class="replaceable-content closed">
                                 <div th:replace="~{fragment/settings :: settings}"/>
                             </div>
+                            <div id="profile-section" class="replaceable-content closed">
+                                <div th:replace="~{fragment/profile :: profile}"/>
+                            </div>
                         </div>
                         <!-- end of replacable content -->
                         
@@ -135,9 +154,15 @@
                 
             </section>
             <!-- end bottom panel -->
-
         </div>
         <!-- end main content -->
+
+         <!-- start of pre-loader -->
+         <div id="preloader" style="display: none;">
+            <svg th:replace="~{fragment/ideSvg :: svg}"/>
+            <p id="preloader-title">Collin Turner Portfolio IDE</p>
+        </div>
+        <!-- end of pre-loader -->
     </body>
     <!-- end of body (IDE Container) -->
 

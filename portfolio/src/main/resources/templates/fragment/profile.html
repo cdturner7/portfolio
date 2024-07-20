@@ -1,0 +1,39 @@
+<!-- Start of the profile section -->
+<div th:fragment="profile">
+    <!-- insert welcome header -->
+    <h1>Profile</h1>
+    <h2>Collin Turner</h2>
+
+    <div id="profile content">
+        <h5>Here is a little bit about me..</h5>
+    </div>
+</div>
+<!-- End of the profile section -->
+
+<!-- Start of the profile hover card section -->
+<div th:fragment="profile-hover-card" id="profile-hover-card">
+    <div id="profile-card-top">
+        <img id="profile-card-image" th:src="@{/images/headshot.jpg}" alt="collin turner's profile">
+    </div>
+    <div id="profile-card-content">
+        <h3 class="text-light-green">Collin Turner</h3>
+        <p class="profile-content">Sr. Software Engineer</p>
+        <p class="profile-content">Burlington, Vermont</p>
+        <hr>
+        <div class="row p-bottom">
+            <span class="profile-card-icon material-symbols-rounded">mail</span>
+            <a th:replace="~{fragment/email :: anchorTag}" th:classappend="profile-content"></a>
+        </div>
+        <div class="row p-bottom">
+            <span class="profile-card-icon material-symbols-rounded">phone_iphone</span>
+            <p class="profile-content">(802) 338-1608</p>
+        </div>
+        <div class="row">
+            <button id="profile-card-resume-button" class="profile-content">
+                <span id="profile-card-resume-icon" class="profile-card-icon material-symbols-rounded">article</span>
+                Resume
+            </button>
+        </div>
+    </div>
+</div>
+<!-- End of the profile hover card section -->
