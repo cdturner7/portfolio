@@ -12,7 +12,7 @@ class IDE {
 
     constructor() {
         // load custom canvas spinner
-        this.preloader();
+        //this.preloader();
 
         // make sure we know what is currently opened on the screen
         this.openedSection = null;

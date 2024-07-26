@@ -1,0 +1,286 @@
+/*
+ *******************************************************************************
+ * Project: Portfolio Website
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2024 CollinDTurner All rights reserved.
+ *******************************************************************************
+*/
+
+/* CSS Strictly for the resume page and section of the site */
+:root {
+
+    /* colors */
+    --white: #fff;
+    --light: #eee;
+    --light-gray: #98a5b8;
+    --gray: #414d5e;
+    --dark-gray: #2c3440;
+    --dark: #222831;
+    --darker: #181c22;
+    --less-black: #13161c;
+    --black: #0d0f13;
+
+    --light-blue: #76ABAE;
+    --light-green: #8EDCAA;
+
+    --black-transparent: #0000004D;
+
+    /* fonts */
+    --font-default: 'Poppins', sans-serif;
+    --font-text: 'Montserrat', sans-serif;
+    --font-header: 'Roboto Flex', sans-serif;
+    --font-michro: 'Michroma', sans-serif;
+
+    /* border radius */
+    --border-radius-circle: 50%;
+    --border-radius-default: 0.5rem;
+}
+
+#profile-container {
+    max-width: 80%;
+    height: fit-content;
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    padding: 5px;
+}
+
+/* left column */
+#left-column {
+    width: 25%;
+    gap: 20px;
+}
+
+#profile-left-top {
+    height: 25%;
+    background-color: var(--darker);
+    border-radius: var(--border-radius-default);
+}
+
+#profile-left-middle {
+    height: 65%;
+    font-size: 0.8rem;
+}
+
+#profile-left-middle hr {
+    height: 5px;
+    width: 95%;
+    margin: auto;
+    background-color: var(--black-transparent);
+    border-radius: var(--border-radius-default);
+    position: relative;
+}
+
+#profile-left-bottom {
+    height: 10%;
+    color: var(--light-gray);
+    background-color: var(--black);
+    border-bottom-left-radius: var(--border-radius-default);
+    border-bottom-right-radius: var(--border-radius-default);
+}
+
+#profile-left-top img {
+    height: 90%;
+    width: auto;
+}
+
+
+/* middle column */
+#middle-column {
+    flex-grow: 1;
+}
+
+
+/* right column */
+#right-column {
+    width: 5%;
+}
+
+.add-shadow {
+    -webkit-box-shadow: 1px 2px 1px 2px var(--shadow-color); 
+    box-shadow: 5px 5px 15px 5px var(--shadow-color);
+}
+
+#skill-circles {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5%;
+    height: 33%;
+    max-height: 100px;
+    text-align: center;
+    margin-bottom: 10%;
+}
+
+.percent-circle {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.percent-circle svg {
+    width: 100%;
+    height: 100%;
+}
+
+.percent-circle svg circle {
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke: var(--light-green);
+    width: 100%;
+    height: 100%;
+    stroke-dasharray: 170;
+    stroke-dashoffset: 170;
+}
+
+.percent-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.percent-circle-title {
+    color: var(--light-gray);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+.p83 {
+    animation: growPercent83 1.3s ease .3s forwards;
+}
+
+.p76 {
+    animation: growPercent76 1.3s ease .3s forwards;
+}
+
+.p68 {
+    animation: growPercent68 1.3s ease .3s forwards;
+}
+
+@keyframes growPercent83 {
+    from {
+        stroke-dashoffset: 170;
+    }
+    to {
+        stroke-dashoffset: 30;
+    }
+}
+
+@keyframes growPercent76 {
+    from {
+        stroke-dashoffset: 170;
+    }
+    to {
+        stroke-dashoffset: 44;
+    }
+}
+
+@keyframes growPercent68 {
+    from {
+        stroke-dashoffset: 170;
+    }
+    to {
+        stroke-dashoffset: 54;
+    }
+}
+
+#progress-bar-container {
+    color: var(--light-gray);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 10px;
+    height: 50%;
+    justify-content: space-evenly;
+}
+
+.progress-bar-row {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.progress-bar-row div {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.progress-bar-row span {
+    width: 100%;
+    height: 5px;
+    position: relative;
+    background-color: var(--dark-gray);
+    border-radius: var(--border-radius-default);
+    overflow: hidden;
+}
+
+.progress-bar-row span::after {
+    content: '';
+    position: absolute;
+    background-color: var(--light-green);
+    border-radius: var(--border-radius-default);
+    height: 100%;
+    transform: translate(-100%, 0);
+    animation: progressGrow 1.3s ease .3s forwards;
+}
+
+.progress-bar-95::after {
+    width: 95%;
+}
+
+.progress-bar-91::after {
+    width: 91%;
+}
+
+.progress-bar-84::after {
+    width: 84%;
+}
+
+.progress-bar-80::after {
+    width: 80%;
+}
+
+.progress-bar-73::after {
+    width: 73%;
+}
+
+@keyframes progressGrow {
+    0% {
+        transform: translate(-100%, 0);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.checkbox-container {
+    width: 100%;
+    height: 25%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-content: center;
+    color: var(--light-gray);
+    padding-left: 10%;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    width: 80%;
+    gap: 5%;
+}
+
+.checkbox-row span {
+    color: var(--light-green);
+    font-size: 1rem;
+}
