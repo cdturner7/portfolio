@@ -52,16 +52,18 @@ public abstract class JSTreeService {
         switch (section) {
             case GIT:
                 return new GitJSTreeService();
-            case PROFILE:
-                return null;
+            //case PROFILE:
+            //    return null;
             case README:
                 return new ReadMeJSTreeService();
-            case RESUME:
-                return null;
-            case SETTINGS:
-                return null;
+            //case RESUME:
+            //    return null;
+            //case SETTINGS:
+            //    return null;
+            //case THREEJS:
+            //    return null;
             default:
-                System.out.println("failed to get js tree service for section: " + section.getID());
+                System.out.println("no js tree service for section: " + section.getID());
                 return null;
         }
     }

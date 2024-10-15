@@ -16,7 +16,8 @@ public class SectionUtils {
         README("readme-section"),
         RESUME("resume-section"),
         PROFILE("profile-section"),
-        SETTINGS("settings-section");
+        SETTINGS("settings-section"),
+        THREEJS("three-js-section");
 
         private String id;
 

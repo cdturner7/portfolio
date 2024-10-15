@@ -23,6 +23,7 @@
                 <a href="/">
                     <img class="icon" th:src="@{/images/ide.png}" alt="collin turner's ide website icon">
                 </a>
+                <input id="fileInput" type="file" style="display:none;" />
                 <button id="file">File</button>
                 <button id="edit">Edit</button>
                 <button id="view">View</button>
@@ -75,6 +76,10 @@
                     <button id="resume" class="material-symbols-outlined tool-tip">
                         article
                         <span class="tool-tip-text-right">My Resume</span>
+                    </button>
+                    <button id="three-js" class="material-symbols-outlined tool-tip">
+                        view_in_ar
+                        <span class="tool-tip-text-right">Some Fun</span>
                     </button>
                 </div>
                 <!-- end of sidebar top section -->
@@ -130,6 +135,9 @@
                             </div>
                             <div id="profile-section" class="replaceable-content closed">
                                 <div th:replace="~{fragment/profile :: profile}"/>
+                            </div>
+                            <div id="three-js-section" class="replaceable-content closed">
+                                <div th:replace="~{fragment/three :: three}"/>
                             </div>
                         </div>
                         <!-- end of replacable content -->

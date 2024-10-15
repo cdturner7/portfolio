@@ -29,7 +29,8 @@ class IDE {
             {id: 'readme',   section: "readme-section",   title: "README",   tabID: 'readme-tab'},
             {id: 'resume',   section: "resume-section",   title: "Resume",   tabID: 'resume-tab'},
             {id: 'profile',  section: "profile-section",  title: "Profile",  tabID: 'profile-tab'},
-            {id: 'settings', section: "settings-section", title: "Settings", tabID: 'settings-tab'}
+            {id: 'settings', section: "settings-section", title: "Settings", tabID: 'settings-tab'},
+            {id: 'three-js', section: 'three-js-section', title: 'ThreeJS',  tabID: 'three-js-tab'}
         ];
 
         // setup button functionality
@@ -50,7 +51,8 @@ class IDE {
             {selector: '#readme',   event: this.sidebarButtonHandler.bind(this)},
             {selector: '#resume',   event: this.sidebarButtonHandler.bind(this)},
             {selector: '#profile',  event: this.sidebarAnchorHandler.bind(this)},
-            {selector: '#settings', event: this.sidebarButtonHandler.bind(this)}
+            {selector: '#settings', event: this.sidebarButtonHandler.bind(this)},
+            {selector: '#three-js', event: this.sidebarButtonHandler.bind(this)}
         ];
         // call the setup buttons function
         this.setupButtons();
@@ -61,7 +63,8 @@ class IDE {
             {selector: '#readme-tab',   event: this.tabSelect.bind(this)},
             {selector: '#resume-tab',   event: this.tabSelect.bind(this)},
             {selector: '#profile-tab',  event: this.tabSelect.bind(this)},
-            {selector: '#settings-tab', event: this.tabSelect.bind(this)}
+            {selector: '#settings-tab', event: this.tabSelect.bind(this)},
+            {selector: '#three-js-tab', event: this.tabSelect.bind(this)}
         ];
 
         // primary panel resizable
@@ -129,14 +132,19 @@ class IDE {
 
     leftHeaderNavButtonHandler(event) {
         event.preventDefault();
-        let buttonId = $(event.target).attr('id');
-        alert('Button clicked: ' + buttonId);
+        let buttonID = $(event.target).attr('id');
+
+        if(buttonID == 'file') {
+            $('#fileInput').click();
+        } else {
+            alert('Button clicked: ' + buttonID);
+        }
     }
 
     rightHeaderNavButtonHandler(event) {
         event.preventDefault();
-        let buttonId = $(event.target).attr('id');
-        alert('Button clicked: ' + buttonId);
+        let buttonID = $(event.target).attr('id');
+        alert('Button clicked: ' + buttonID);
     }
 
     sidebarAnchorHandler(event) {

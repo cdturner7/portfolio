@@ -114,6 +114,7 @@ button {
 }
 
 .scrollbar {
+    overflow: auto;
     scrollbar-color: var(--dark-gray) var(--darker);
     scrollbar-width: thin;
 }
