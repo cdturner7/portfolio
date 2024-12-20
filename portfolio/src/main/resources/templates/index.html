@@ -1,0 +1,44 @@
+<!--
+ *******************************************************************************
+ * Project: Portfolio Site
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2024 GearBlob All rights reserved.
+ *******************************************************************************
+-->
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    
+    <!-- insert head -->
+    <head th:replace="~{fragment/head :: head}"/>
+
+    <!-- start of body -->
+    <body>
+
+        <!-- start header -->
+        <header id="header" class="dark-gray">
+           
+        </header>
+        <!-- end header -->
+        
+        <!-- start main content -->
+        <div id="main-content">
+
+            <h1>Collin Turner's Portfolio</h1>
+            
+        </div>
+        <!-- end main content -->
+
+         <!-- start of pre-loader -->
+         <div id="preloader" style="display: none;">
+            <svg th:replace="~{fragment/svg/ide :: svg}"/>
+            <p id="preloader-title">loading</p>
+        </div>
+        <!-- end of pre-loader -->
+
+    </body>
+    <!-- end body -->
+
+</html>
