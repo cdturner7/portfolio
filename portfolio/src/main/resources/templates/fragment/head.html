@@ -22,41 +22,16 @@
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-    <!-- JQuery custom (resize)-->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.js"></script>
+     <!-- gsap -->
+     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
-    <!-- gsap -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-
-    <!-- JSTree -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
-    
     <!-- basesite ui -->
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
-    
-    <!-- css specific page nodes -->
-    <link rel="stylesheet" th:href="@{/css/three.css}"/>
-    <link rel="stylesheet" th:href="@{/css/resume.css}"/>
-    <link rel="stylesheet" th:href="@{/css/profile.css}"/>
 
     <!-- favorite icon -->
     <link rel="icon" th:href="@{/images/ide.png}"/>
-
-    <!-- import map for three.js from a CDN -->
-    <script type="importmap">
-        {
-          "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
-          }
-        }
-    </script>
     
     <!-- script for ide -->
-    <script th:src="@{/scripts/ide.js}"   type="text/javascript"></script>
-    <script th:src="@{/scripts/three.js}" type="module"></script>
+    <script th:src="@{/scripts/style.js}"   type="text/javascript"></script>
 
 </head>

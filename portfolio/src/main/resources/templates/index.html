@@ -15,163 +15,30 @@
     <head th:replace="~{fragment/head :: head}"/>
 
     <!-- start of body -->
-    <body id="ide-container">
-        <!-- IDE header -->
+    <body>
+
+        <!-- start header -->
         <header id="header" class="dark-gray">
-            <!-- start ide header nav -->
-            <div id="header-nav-left">
-                <a href="/">
-                    <img class="icon" th:src="@{/images/ide.png}" alt="collin turner's ide website icon">
-                </a>
-                <input id="fileInput" type="file" style="display:none;" />
-                <button id="file">File</button>
-                <button id="edit">Edit</button>
-                <button id="view">View</button>
-                <button id="run">Run</button>
-                <button id="help">Help</button>
-            </div>
-            <!-- end ide header nav -->
-            <!-- start title of site-->
-            <div id="title-container">
-                <h1 id="title">Collin's Integrated Development Environment (IDE) Portfolio</h1>
-            </div>
-            <!-- end title of site-->
-            <!-- start header right nav -->
-            <div id="header-nav-right">
-                <button id="toggle-primary-panel" class="material-symbols-outlined tool-tip">
-                    side_navigation
-                    <span class="tool-tip-text-bottom-left">Toggle Primary Sidebar Panel</span>
-                </button>
-                <button id="toggle-secondary-panel" class="material-symbols-outlined tool-tip">
-                    page_info
-                    <span class="tool-tip-text-bottom-left">Toggle Bottom Panel</span>
-                </button>
-                <button id="customize-layout" class="material-symbols-outlined tool-tip">
-                    stacks
-                    <span class="tool-tip-text-bottom-left">Customize Layout</span>
-                </button>
-                <button id="code-cube" class="material-symbols-outlined tool-tip">
-                    deployed_code
-                    <span class="tool-tip-text-bottom-left">Coming Soon</span>
-                </button>
-            </div>
-            <!-- end header right nav -->
+           
         </header>
-        <!-- end IDE header -->
+        <!-- end header -->
         
         <!-- start main content -->
         <div id="main-content">
-            <!-- IDE sidebar -->
-            <section id="sidebar" class="dark-gray flex-center column">
-                <!-- start sidebar top section -->
-                <div id="sidebar-top">
-                    <button id="readme" class="material-symbols-outlined tool-tip">
-                        home
-                        <span class="tool-tip-text-right">README page</span>
-                    </button>
-                    <button id="git" class="material-symbols-outlined tool-tip">
-                        conversion_path
-                        <span class="tool-tip-text-right">Git Information</span>
-                    </button>
-                    <button id="resume" class="material-symbols-outlined tool-tip">
-                        article
-                        <span class="tool-tip-text-right">My Resume</span>
-                    </button>
-                    <button id="three-js" class="material-symbols-outlined tool-tip">
-                        view_in_ar
-                        <span class="tool-tip-text-right">Some Fun</span>
-                    </button>
-                </div>
-                <!-- end of sidebar top section -->
 
-                <!-- start sidebar bottom section -->
-                <div id="sidebar-bottom">
-                    <button id="settings" class="material-symbols-outlined tool-tip">
-                        settings
-                        <span class="tool-tip-text-right">Settings</span>
-                    </button>
-                    <div id="profile-avatar">
-                        <a id="profile" class="flex-center" href="#">
-                            <img id="profile-icon" th:src="@{/images/headshot.jpg}" alt="collin turner's profile">
-                        </a>
-                        <div th:replace="~{fragment/profile :: profile-hover-card}"/>
-                    </div>
-                    
-                </div>
-                <!-- end of sidebar bottom section -->
-            </section>
-            <!-- end IDE sidebar -->
-
-            <!-- main replacable content area -->
-            <div class="row">
-                <!-- IDE primary side panel -->
-                <section id="primary-panel" class="darker resizableX scrollbar ui-widget-content">
-                    <div id="primary-panel-jstree"></div>
-                </section>
-                <!-- end primary side panel -->
-
-                <!-- tabs and main editor sections -->
-                <div id="tabs-main-editor-container" class="column">
-                    
-                    <!-- tabs section -->
-                    <section id="tabsSection" class="row"></section>
-                    <!-- end tabs section -->
-
-                    <!-- start main editor section -->
-                    <section id="main-editor-section" class="row">
-                        <!-- start of replacable content -->
-                        <div id="replaceable-content-container" class="scrollbar">
-                            <div id="readme-section" class="replaceable-content closed">
-                                <div th:replace="~{fragment/readme :: readme}"/>
-                            </div>
-                            <div id="git-section" class="replaceable-content closed">
-                                <div th:replace="~{fragment/git :: git}"/>
-                            </div>
-                            <div id="resume-section" class="replaceable-content closed">
-                                <div th:replace="~{fragment/resume :: resume}"/>
-                            </div>
-                            <div id="settings-section" class="replaceable-content closed">
-                                <div th:replace="~{fragment/settings :: settings}"/>
-                            </div>
-                            <div id="profile-section" class="replaceable-content closed">
-                                <div th:replace="~{fragment/profile :: profile}"/>
-                            </div>
-                            <div id="three-js-section" class="replaceable-content closed">
-                                <div th:replace="~{fragment/three :: three}"/>
-                            </div>
-                        </div>
-                        <!-- end of replacable content -->
-                        
-                        <!-- start of scroll bar mini map -->
-                        <div id="mini-map-container">
-                            <div id="mini-map">
-                                <div id="mini-map-content"></div>
-                                <div id="mini-map-viewport"></div>
-                            </div>
-                        </div>
-                        <!-- end of scroll bar mini map -->
-                    </section>
-                    <!-- end main editor section -->
-                </div>
-                <!-- end of tabs and main editor sections -->
-            </div>
-            <!-- end main replacable content area -->
-
-            <!-- start bottom panel -->
-            <section id="secondary-panel" class="dark-gray resizableY closed">
-                
-            </section>
-            <!-- end bottom panel -->
+            <h1>Collin Turner's Portfolio</h1>
+            
         </div>
         <!-- end main content -->
 
          <!-- start of pre-loader -->
          <div id="preloader" style="display: none;">
             <svg th:replace="~{fragment/svg/ide :: svg}"/>
-            <p id="preloader-title">Collin Turner Portfolio IDE</p>
+            <p id="preloader-title">loading</p>
         </div>
         <!-- end of pre-loader -->
+
     </body>
-    <!-- end of body (IDE Container) -->
+    <!-- end body -->
 
 </html>
