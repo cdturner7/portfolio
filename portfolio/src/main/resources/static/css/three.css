@@ -1,0 +1,72 @@
+/*
+ *******************************************************************************
+ * Project: Portfolio Website
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2024 CollinDTurner All rights reserved.
+ *******************************************************************************
+*/
+
+/* CSS Strictly for the three js tab and section of the site */
+
+:root {
+
+    /* colors */
+    --white: #fff;
+    --light: #eee;
+    --light-gray: #98a5b8;
+    --gray: #414d5e;
+    --dark-gray: #2c3440;
+    --dark: #222831;
+    --darker: #181c22;
+    --less-black: #13161c;
+    --black: #0d0f13;
+
+    --light-blue: #76ABAE;
+    --light-green: #8EDCAA;
+
+    --black-transparent: #0000004D;
+
+    /* fonts */
+    --font-default: 'Poppins', sans-serif;
+    --font-text: 'Montserrat', sans-serif;
+    --font-header: 'Roboto Flex', sans-serif;
+    --font-michro: 'Michroma', sans-serif;
+
+    /* border radius */
+    --border-radius-circle: 50%;
+    --border-radius-default: 0.5rem;
+}
+
+#kill-three-js,
+#start-three-js {
+    padding: 20px;
+    font-size: 1.1rem;
+    color: var(--light);
+    border: solid 2px var(--darker);
+    transition-duration: .3s;
+}
+
+#kill-three-js {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+#kill-three-js:hover,
+#start-three-js:hover {
+    background-color: var(--dark);
+    transform: scale(1.1);
+}
+
+#three-js-section-view,
+#three-js-section,
+#three-js-container {
+    width: 100%;
+    height: 100%;
+}
+
+#three-js-section-view {
+    display: flex;
+}
