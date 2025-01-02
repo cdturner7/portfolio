@@ -11,8 +11,15 @@
 class Base {
 
     constructor() {
+
+        // setup button links
+        $(".style-guide-button").click(() => {window.location = "/styleguide"});
+
         // load custom canvas spinner
-        this.preloader();
+        let preloaderEnabled = false;
+        if (preloaderEnabled) {
+            this.preloader();
+        }
     }
 
     /* preloader and loading page overlay management */

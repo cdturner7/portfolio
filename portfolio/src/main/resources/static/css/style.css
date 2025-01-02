@@ -4,14 +4,15 @@
  *
  * Author: Collin Turner
  * =============================================================================
- * (c) Copyright 2024 CollinDTurner All rights reserved.
+ * (c) Copyright 2025 CollinDTurner All rights reserved.
  *******************************************************************************
 */
 
 :root {
 
     /* colors */
-    --background-color: #222831;
+    --background-color: #eee;
+    --background-color-dark: #222831;
 
     --white: #fff;
     --light: #eee;
@@ -28,6 +29,7 @@
     --purple: #b702ff;
     --red: #C23535;
 
+    --white-transparent: #ffffff4D;
     --black-transparent: #0000004D;
 
     /* fonts */
@@ -45,7 +47,6 @@
     margin: 0;
     padding: 0;
     outline: 0;
-    appearance: 0;
     border: 0;
     text-decoration: none;
     box-sizing: border-box;
@@ -55,13 +56,17 @@ html {
     font-size: 16px;
     font-family: var(--font-default);
     font-weight: 300;
-    color: var(--light);
+    color: var(--black);
 }
 
 body {
-    background-color: var(--darker);
+    background-color: var(--background-color);
     width: 100%;
     min-height: 100vh;
+}
+
+header {
+    padding: 25px 10%;
 }
 
 button {
@@ -70,10 +75,29 @@ button {
     border-radius: var(--border-radius-default);
 }
 
+/* header logo */
+#header-logo-container a {
+    display: flex;
+}
+
+#header-logo-container img {
+    width: 50px;
+}
+
 /* generic classes */
+.light-gray {
+    background-color: var(--light-gray);
+    color: var(--darker);
+}
+
 .dark-gray {
     background-color: var(--dark-gray);
-    color: var(--light-gray)
+    color: var(--light-gray);
+}
+
+.dark-gray {
+    background-color: var(--dark-gray);
+    color: var(--light-gray);
 }
 
 .darker {

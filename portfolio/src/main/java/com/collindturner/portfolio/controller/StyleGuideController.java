@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
-@RequestMapping({"", "/"})
-public class IndexController {
+@RequestMapping("/styleguide")
+public class StyleGuideController {
 
     @GetMapping
-    public String displayHomepage() {
-        return "index";
+    public String displayStyleGuide() {
+        return "style-guide";
     }
 
 }

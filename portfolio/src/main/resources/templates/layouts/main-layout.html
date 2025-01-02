@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <!-- insert head -->
+    <head>
+        <th:block th:replace="~{fragments/head :: head}"/>
+        <!-- Each token will be replaced by their respective titles in the resulting page. -->
+        <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Collin D Turner</title>
+    </head>
+
+    <!-- start of body -->
+    <body>
+        <!-- insert header -->
+        <header th:replace="~{fragments/header :: header}"></header>
+        
+        <!-- start main content -->
+        <div class="container">
+            <th:block layout:fragment="content"></th:block>
+        </div>
+        <!-- end main content -->
+
+        <!-- insert footer -->
+        <div th:replace="~{fragments/footer :: footer}"></div>
+
+        <!-- start of pre-loader -->
+        <div id="preloader" style="display: none;">
+            <svg th:replace="~{fragments/svg/preloader :: svg}"/>
+            <p id="preloader-title">loading</p>
+        </div>
+        <!-- end of pre-loader -->
+
+    </body>
+    <!-- end body -->
+    
+</html>
