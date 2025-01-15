@@ -21,6 +21,67 @@
         <!-- STYLE GUIDE Page main content plug -->
         <th:block layout:fragment="content">
             <h1>Collin's Portfolio Style Guide</h1>
+
+            <!-- COLORS -->
+            <h2 class="style-guide-content-header font-weight-bold">Colors</h2>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
+                <div class="col" th:each="entry : ${variables.colors}">
+                    <div class="row align-items-center m-0 pb-3">
+                        <div class="style-guide-color-swatch" th:style="'background-color: ' + ${entry.value}"></div>
+                        <div class="col" th:text="${entry.key}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FONTS -->
+            <h2 class="style-guide-content-header font-weight-bold">Fonts</h2>
+            <div class="row row-cols-2">
+                <div th:each="entry, status : ${variables.fonts}" th:classappend="${status.even} ? 
+                    'col-6 col-md-7 col-xl-8 col-xxl-9' : 'col-6 col-md-5 col-xl-4 col-xxl-3'">
+                    <div class="row align-items-center m-0 pb-3 style-guide-font-container" th:style="'font-family: ' + ${entry.value}">
+                        <h1 th:text="${entry.key}"></h1>
+                        <p th:text="'Some text with ' + ${entry.key}"></p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- HEADINGS -->
+            <h2 class="style-guide-content-header font-weight-bold">Headings</h2>
+            <h1 class="pb-3">Heading 1</h1>
+            <h2 class="pb-3">Heading 2</h2>
+            <h3 class="pb-3">Heading 3</h3>
+            <h4>Heading 4</h4>
+
+            <!-- DISPLAY HEADINGS -->
+            <h2 class="style-guide-content-header font-weight-bold">Display Headings</h2>
+            <h1 class="display-1">Display 1</h1>
+            <h1 class="display-2">Display 2</h1>
+            <h1 class="display-3">Display 3</h1>
+            <h1 class="display-4">Display 4</h1>
+
+            <!-- BUTTONS -->
+            <h2 class="style-guide-content-header font-weight-bold">Buttons</h2>
+            <div class="pb-3">
+                <button class="primary">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                    <p>Primary Button</p>
+                </button>
+            </div>
+            <div class="pb-3">
+                <button class="primary-alt">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                    <p>Primary Button Alternative</p>
+                </button>
+            </div>
+            <div class="pb-3">
+                <button class="secondary">Secondary Button</button>
+            </div>
+            <div>
+                <button class="secondary-alt">Secondary Button Alternative</button>
+            </div>
+            
+
         </th:block>
 
     </body>

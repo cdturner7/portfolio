@@ -14,6 +14,7 @@ class Base {
 
         // setup button links
         $(".style-guide-button").click(() => {window.location = "/styleguide"});
+        $(".test-page-button").click(() => {window.location = "/test"});
 
         // load custom canvas spinner
         let preloaderEnabled = false;

@@ -11,36 +11,52 @@
 :root {
 
     /* colors */
-    --background-color: #eee;
-    --background-color-dark: #222831;
+    --color-background: #eee;
+    --color-background-dark: #222831;
 
-    --white: #fff;
-    --light: #eee;
-    --light-gray: #98a5b8;
-    --gray: #414d5e;
-    --dark-gray: #2c3440;
-    --dark: #222831;
-    --darker: #181c22;
-    --less-black: #13161c;
-    --black: #0d0f13;
+    --color-white: #fff;
+    --color-light: #eee;
+    --color-light-gray: #98a5b8;
+    --color-gray: #414d5e;
+    --color-dark-gray: #2c3440;
+    --color-dark: #222831;
+    --color-darker: #181c22;
+    --color-less-black: #13161c;
+    --color-black: #0d0f13;
 
-    --light-blue: #76ABAE;
-    --light-green: #8EDCAA;
-    --purple: #b702ff;
-    --red: #C23535;
+    --color-light-blue: #76ABAE;
+    --color-light-green: #8EDCAA;
+    --color-bright-green: #acf464;
+    --color-green: #1ca03b;
+    --color-purple: #b702ff;
+    --color-red: #C23535;
 
-    --white-transparent: #ffffff4D;
-    --black-transparent: #0000004D;
+    --color-white-transparent: #ffffff4D;
+    --color-black-transparent: #0000004D;
+
+    --color-transparent: #ffffff00;
 
     /* fonts */
-    --font-default: 'Poppins', sans-serif;
-    --font-text: 'Montserrat', sans-serif;
-    --font-header: 'Roboto Flex', sans-serif;
-    --font-michro: 'Michroma', sans-serif;
+    --font-poppins: 'Poppins', sans-serif;
+    --font-montserrat: 'Montserrat', sans-serif;
+    --font-roboto-flex: 'Roboto Flex', sans-serif;
+    --font-michroma: 'Michroma', sans-serif;
 
     /* border radius */
-    --border-radius-circle: 50%;
+    --border-radius-circle: 100rem;
     --border-radius-default: 0.5rem;
+
+    /* box shadow */
+    --webkit-box-shadow-default: 0px 5px 10px 0px #414d5e70;
+    --box-shadow-default: 0px 5px 10px 0px #414d5e70;
+    --webkit-box-shadow-default-hover: 0px 1px 5px 0px #414d5e70;
+    --box-shadow-default-hover: 0px 1px 5px 0px #414d5e70;
+
+    /* gradients (used with css attr - background) */
+    --moz-linear-gradient-default: -moz-linear-gradient(45deg, var(--color-green) 50px, var(--color-white) 50px);
+    --webkit-linear-gradient-default: -webkit-linear-gradient(45deg, var(--color-green) 50px, var(--color-white) 50px);
+    --linear-gradient-default: linear-gradient(45deg, var(--color-green) 50px, var(--color-white) 50px);
+    --linear-gradient-default-fill: linear-gradient(45deg, var(--color-green) calc(100% - 50px), var(--color-transparent) 50px);
 }
 
 * {
@@ -54,13 +70,13 @@
 
 html {
     font-size: 16px;
-    font-family: var(--font-default);
+    font-family: var(--font-poppins);
     font-weight: 300;
-    color: var(--black);
+    color: var(--color-black);
 }
 
 body {
-    background-color: var(--background-color);
+    background-color: var(--color-background);
     width: 100%;
     min-height: 100vh;
 }
@@ -70,39 +86,107 @@ header {
 }
 
 button {
-    background: none;
+    display: inline-block;
+    padding: 0.5rem;
     cursor: pointer;
     border-radius: var(--border-radius-default);
+    -webkit-box-shadow: var(--webkit-box-shadow-default);
+    box-shadow: var(--box-shadow-default);
+    transition: box-shadow ease 0.3s;
+}
+
+button:hover {
+    -webkit-box-shadow: var(--webkit-box-shadow-default-hover);
+    box-shadow: var(--box-shadow-default-hover);
+}
+
+button > p {
+    margin: 0;
+}
+
+button > span {
+    color: var(--color-white) !important;
+}
+
+button.primary, button.primary-alt {
+    display: flex;
+    padding-left: 0.5rem 1rem;
+    gap: 30px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1; /* Keeps the button content above the pseudo-element */
+    transition: color 0.3s ease; /* Smooth color transition */
+    background: var(--linear-gradient-default);
+}
+
+/* Add a pseudo-element for the gradient animation */
+button.primary::before, button.primary-alt::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -200%;
+    width: 200%;
+    height: 100%;
+    color: white;
+    background: var(--linear-gradient-default-fill);
+    z-index: -1; /* Places the pseudo-element below the button content */
+    transform: translate(100px); /* Initial state: No transformation */
+    transform-origin: left; /* Animation starts from the left */
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Hover effect */
+button.primary:hover::before, button.primary-alt:hover::before {
+    transform: translate(100%);
+}
+
+button.primary-alt {
+    border-radius: var(--border-radius-circle);
+}
+
+button.primary-alt, button.secondary-alt {
+    border-radius: var(--border-radius-circle);
+}
+
+.shadow {
+    -webkit-box-shadow: var(--webkit-box-shadow-default);
+    box-shadow: var(--box-shadow-default);
+}
+
+.shadow:hover {
+    -webkit-box-shadow: var(--webkit-box-shadow-default-hover);
+    box-shadow: var(--box-shadow-default-hover);
 }
 
 /* header logo */
-#header-logo-container a {
+a.logo-link {
     display: flex;
 }
 
-#header-logo-container img {
+img.logo {
     width: 50px;
 }
 
 /* generic classes */
 .light-gray {
-    background-color: var(--light-gray);
-    color: var(--darker);
+    background-color: var(--color-light-gray);
+    color: var(--color-darker);
 }
 
 .dark-gray {
-    background-color: var(--dark-gray);
-    color: var(--light-gray);
+    background-color: var(--color-dark-gray);
+    color: var(--color-light-gray);
 }
 
 .dark-gray {
-    background-color: var(--dark-gray);
-    color: var(--light-gray);
+    background-color: var(--color-dark-gray);
+    color: var(--color-light-gray);
 }
 
 .darker {
-    background-color: var(--darker);
-    color: var(--light);
+    background-color: var(--color-darker);
+    color: var(--color-light);
 }
 
 .center {
@@ -113,25 +197,33 @@ button {
 }
 
 .text-light-green {
-    color: var(--light-green);
+    color: var(--color-light-green);
 }
 
-.p-y {
-    padding: 10px 0;
-}
-
-.p-x {
-    padding: 0 10px;
-}
-
-.p-top {
-    padding-top: 10px;
-}
-
-.p-bottom {
-    padding-bottom: 10px;
+.text-muted {
+    color: var(--color-dark-gray);
 }
 /* end generic classes */
+
+
+.style-guide-content-header {
+    border-bottom: 1px solid var(--color-black);
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    display: inline-block;
+}
+
+.style-guide-color-swatch {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--border-radius-default);
+    border: solid 1px var(--color-black);
+}
+
+.style-guide-font-container > h1,
+.style-guide-font-container > p {
+    padding: 0;
+}
 
 /* tooltips */
 .tool-tip {
@@ -152,7 +244,7 @@ button {
 /* icons */
 .material-symbols-outlined,
 .material-symbols-rounded {
-    color: var(--light-gray);
+    color: var(--color-light-gray);
 }
 
 .material-symbols-outlined {
@@ -178,7 +270,7 @@ button {
 }
 
 #social-icons svg:hover {
-    color: var(--light-green);
+    color: var(--color-light-green);
     cursor: pointer;
 }
 /* end icons */
@@ -226,18 +318,18 @@ button {
     height: 100%;
     top: 0;
     left: 0;
-    background: var(--less-black);
-    background: -moz-linear-gradient(90deg, rgba(13,15,19,1) 0%, rgba(65,77,94,1) 100%);
-    background: -webkit-linear-gradient(90deg, rgba(13,15,19,1) 0%, rgba(65,77,94,1) 100%);
-    background: linear-gradient(90deg, var(--black) 0%, var(--gray) 100%);
+    background: var(--color-less-black);
+    background: -moz-linear-gradient(90deg, var(--color-black) 0%, var(--color-gray) 100%);
+    background: -webkit-linear-gradient(90deg, var(--color-black) 0%, var(--color-gray) 100%);
+    background: linear-gradient(90deg, var(--color-black) 0%, var(--color-gray) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0d0f13",endColorstr="#414d5e",GradientType=1);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-family: var(--font-michro);
+    font-family: var(--font-michroma);
     gap: 2rem;
-    color: var(--white);
+    color: var(--color-white);
     z-index: 100;
     letter-spacing: 3px;
 }
@@ -245,7 +337,7 @@ button {
 #preloader svg {
     width: 300px;
     height: 300px;
-    stroke: var(--white);
+    stroke: var(--color-white);
     stroke-width: 3px;
     fill-opacity: 0;
     stroke-dasharray: 5000;

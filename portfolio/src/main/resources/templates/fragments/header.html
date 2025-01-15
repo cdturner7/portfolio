@@ -1,8 +1,25 @@
-        <header th:fragment="header" id="header">
-            <!-- logo -->
-            <div id="header-logo-container">
-                <a th:href="@{/}">
-                    <img th:src="@{/images/ide.png}" threfalt="Collin's Portfolio Website Logo">
-                </a>
-            </div>
-        </header>
+        <th:block th:fragment="header">
+            <header class="container">
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+                    <div class="col-md-3 mb-2 mb-md-0">
+                        <!-- logo -->
+                        <a class="logo-link" th:href="@{/}">
+                            <img class="logo" th:src="@{/images/ide.png}" alt="Collin's Portfolio Website Logo">
+                        </a>
+                    </div>
+            
+                    <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                        <li><a th:href="@{/}" class="nav-link px-2 link-secondary">Home</a></li>
+                        <li><a th:href="@{/styleguide}" class="nav-link px-2">Style Guide</a></li>
+                        <li><a th:href="@{/test}" class="nav-link px-2">Test Page</a></li>
+                    </ul>
+                
+                    <div class="col-md-3 text-end">
+                        <button type="button" class="btn btn-outline-primary me-2">Login</button>
+                        <button type="button" class="btn btn-primary">Sign-up</button>
+                    </div>
+                </div>
+            </header>
+        </th:block>
+
+        
