@@ -7,18 +7,17 @@
                         <a class="logo-link" th:href="@{/}">
                             <img class="logo" th:src="@{/images/ide.png}" alt="Collin's Portfolio Website Logo">
                         </a>
+                        <th:block th:replace="~{fragments/social :: socials}"></th:block> 
                     </div>
               
                     <div class="col"></div>
                 
                     <div class="col">
-                        <h5>Section</h5>
+                        <h5>Links</h5>
                         <ul class="nav flex-column">
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Home</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Features</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Pricing</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">FAQs</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">About</a></li>
+                            <li class="nav-item mb-2"><a th:href="@{/}" class="nav-link p-0 text-muted">Home</a></li>
+                            <li class="nav-item mb-2"><a th:href="@{/styleguide}" class="nav-link p-0 text-muted">Style Guide</a></li>
+                            <li class="nav-item mb-2"><a th:href="@{/test}" class="nav-link p-0 text-muted">Test Page</a></li>
                         </ul>
                     </div>
                 
@@ -34,19 +33,16 @@
                     </div>
                 
                     <div class="col">
-                        <h5>Section</h5>
+                        <h5>Legal</h5>
                         <ul class="nav flex-column">
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Home</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Features</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Pricing</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">FAQs</a></li>
-                            <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">About</a></li>
+                            <li class="nav-item mb-2"><a th:href="@{/privacypolicy}" class="nav-link p-0 text-muted">Privacy Policy</a></li>
+                            <li class="nav-item mb-2"><a th:href="@{/tos}" class="nav-link p-0 text-muted">Terms of Service</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="flex-center border-top">
-                    <p class="text-muted" style="margin-top: 1rem;">&copy; CollinDTurner 2025</p>
+                    <p class="text-muted" style="margin-top: 1rem;">&copy; 2025 CollinDTurner.</p>
                 </div>
             
             </footer>

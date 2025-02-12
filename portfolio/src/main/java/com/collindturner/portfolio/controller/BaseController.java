@@ -9,19 +9,8 @@
 */
 package com.collindturner.portfolio.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.collindturner.portfolio.utils.BaseProcessor;
 
-@Controller
-@RequestMapping("/test")
-public class TestController extends BaseController {
+public class BaseController extends BaseProcessor {
 
-    @GetMapping
-    public String test(Model model) {
-        return "test";
-    }
-    
 }
-

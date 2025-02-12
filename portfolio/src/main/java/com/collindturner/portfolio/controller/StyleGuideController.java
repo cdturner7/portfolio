@@ -19,7 +19,7 @@ import org.springframework.ui.Model;
 
 @Controller
 @RequestMapping("/styleguide")
-public class StyleGuideController {
+public class StyleGuideController extends BaseController {
 
     private CSSService cssService;
 

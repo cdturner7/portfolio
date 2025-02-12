@@ -4,7 +4,7 @@
  *
  * Author: Collin Turner
  * =============================================================================
- * (c) Copyright 2025 GearBlob All rights reserved.
+ * (c) Copyright 2025 CollinDTurner All rights reserved.
  *******************************************************************************
 -->
 <!doctype html>
@@ -38,9 +38,9 @@
             <div class="row row-cols-2">
                 <div th:each="entry, status : ${variables.fonts}" th:classappend="${status.even} ? 
                     'col-6 col-md-7 col-xl-8 col-xxl-9' : 'col-6 col-md-5 col-xl-4 col-xxl-3'">
-                    <div class="row align-items-center m-0 pb-3 style-guide-font-container" th:style="'font-family: ' + ${entry.value}">
-                        <h1 th:text="${entry.key}"></h1>
-                        <p th:text="'Some text with ' + ${entry.key}"></p>
+                    <div class="row align-items-center m-0 pb-3 style-guide-font-container">
+                        <h1 th:style="'font-family: ' + ${entry.value}" th:text="${entry.key}"></h1>
+                        <p th:style="'font-family: ' + ${entry.value}" th:text="'Some text with ' + ${entry.key}"></p>
                     </div>
                 </div>
             </div>
@@ -57,8 +57,6 @@
             <h2 class="style-guide-content-header font-weight-bold">Display Headings</h2>
             <h1 class="display-1">Display 1</h1>
             <h1 class="display-2">Display 2</h1>
-            <h1 class="display-3">Display 3</h1>
-            <h1 class="display-4">Display 4</h1>
 
             <!-- BUTTONS -->
             <h2 class="style-guide-content-header font-weight-bold">Buttons</h2>

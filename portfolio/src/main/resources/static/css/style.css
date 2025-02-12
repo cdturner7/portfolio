@@ -81,8 +81,21 @@ body {
     min-height: 100vh;
 }
 
+header, footer {
+    padding: 2rem;
+    margin-block: 2rem;
+}
+
 header {
-    padding: 25px 10%;
+    background: -moz-linear-gradient(bottom, var(--color-background) 0%, var(--color-white) 10%);
+    background: -webkit-linear-gradient(bottom, var(--color-background) 0%, var(--color-white) 10%);
+    background: linear-gradient(to top, var(--color-background) 0%, var(--color-white) 10%);
+}
+
+footer {
+    background: -moz-linear-gradient(top, var(--color-background) 0%, var(--color-white) 10%);
+    background: -webkit-linear-gradient(top, var(--color-background) 0%, var(--color-white) 10%);
+    background: linear-gradient(to bottom, var(--color-background) 0%, var(--color-white) 10%);
 }
 
 button {
@@ -108,45 +121,64 @@ button > span {
     color: var(--color-white) !important;
 }
 
-button.primary, button.primary-alt {
+button.primary, button.secondary {
     display: flex;
-    padding-left: 0.5rem 1rem;
-    gap: 30px;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    z-index: 1; /* Keeps the button content above the pseudo-element */
-    transition: color 0.3s ease; /* Smooth color transition */
-    background: var(--linear-gradient-default);
 }
 
-/* Add a pseudo-element for the gradient animation */
-button.primary::before, button.primary-alt::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -200%;
-    width: 200%;
-    height: 100%;
-    color: white;
-    background: var(--linear-gradient-default-fill);
-    z-index: -1; /* Places the pseudo-element below the button content */
-    transform: translate(100px); /* Initial state: No transformation */
-    transform-origin: left; /* Animation starts from the left */
-    transition: transform 0.5s ease-in-out;
+button.primary {
+    background-color: var(--color-green);
 }
 
-/* Hover effect */
-button.primary:hover::before, button.primary-alt:hover::before {
-    transform: translate(100%);
-}
-
-button.primary-alt {
-    border-radius: var(--border-radius-circle);
+button.secondary {
+    background-color: var(--color-light-green);
 }
 
 button.primary-alt, button.secondary-alt {
     border-radius: var(--border-radius-circle);
+}
+
+button.primary-alt {
+    background-color: var(--color-bright-green);
+}
+
+button.secondary-alt {
+    background-color: var(--color-light-blue);
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-roboto-flex);
+    font-weight: 300;
+    letter-spacing: 0.5rem;
+}
+
+h1.display-1, h1.display-2 {
+    font-family: var(--font-montserrat);
+}
+
+h1.display-1 {
+    font-weight: 900;
+    font-size: 7rem;
+}
+
+h1.display-2 {
+    font-weight: 700;
+    font-size: 5rem;
+}
+
+.poppins {
+    font-family: var(--font-poppins);
+}
+
+.michroma {
+    font-family: var(--font-michroma);
+}
+
+.montserrat {
+    font-family: var(--font-montserrat);
+}
+
+.roboto {
+    font-family: var(--font-roboto-flex);
 }
 
 .shadow {

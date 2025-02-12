@@ -16,7 +16,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @RequestMapping({"", "/"})
-public class IndexController {
+public class IndexController extends BaseController {
 
     @GetMapping
     public String displayHomepage() {

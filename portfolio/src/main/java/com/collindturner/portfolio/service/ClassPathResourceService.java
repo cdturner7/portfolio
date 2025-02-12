@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import com.collindturner.portfolio.model.Result;
 
 @Service
-public class ClassPathResourceService {
+public class ClassPathResourceService extends BaseService {
 
     public Result<String> getFileContents(String filePath) {
         Result<String> result = new Result<>();

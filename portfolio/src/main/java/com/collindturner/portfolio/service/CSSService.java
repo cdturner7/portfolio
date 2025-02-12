@@ -20,7 +20,7 @@ import com.collindturner.portfolio.model.WebStyles;
 import com.collindturner.portfolio.utils.CDTUtils;
 
 @Service
-public class CSSService {
+public class CSSService extends BaseService {
 
     public final String CSS_PATH = "static/css/style.css";
 

@@ -13,14 +13,14 @@
       layout:decorate="~{layouts/main-layout}">
     
     <head>
-        <title>Test Page</title>
+        <title>API Results</title>
     </head>
 
     <body>
 
         <!-- INDEX Page main content plug -->
         <th:block layout:fragment="content">
-           
+           <div th:text="${stockOverview}"></div>
         </th:block>
 
     </body>
