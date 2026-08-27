@@ -1,15 +1,17 @@
 # portfolio
 
-Collin Turner's personal portfolio / "about me" website.
+Collin Turner's personal portfolio / "about me" website &mdash; rendered to look like the
+IntelliJ IDEA IDE. The homepage is an IDE shell: a project tree of "files" that open in
+draggable, closable editor tabs, with content loaded on demand.
 
-A server-rendered web app built with **Spring Boot 3.5** (Java 21), **Thymeleaf** (with the
-layout dialect) for templating, and **Bootstrap 5** for styling. The Maven project lives in
-the [`portfolio/`](portfolio/) subdirectory.
+Built with **Spring Boot 4.1** (Java 21), **Thymeleaf** (layout dialect), a hand-rolled
+vanilla-JS front end, and one CSS file approximating IntelliJ's "New UI" dark theme. The
+Maven project lives in the [`portfolio/`](portfolio/) subdirectory.
 
 ## Requirements
 
 - JDK 21+
-- No local Maven needed — use the bundled wrapper (`mvnw` / `mvnw.cmd`)
+- No local Maven needed &mdash; use the bundled wrapper (`mvnw` / `mvnw.cmd`)
 
 ## Run
 
@@ -18,7 +20,7 @@ cd portfolio
 ./mvnw spring-boot:run          # Windows: mvnw.cmd spring-boot:run
 ```
 
-The site starts on <http://localhost:8080>.
+The site starts on <http://localhost:8080> (`server.port` follows `$PORT` when set).
 
 ## Build & test
 
@@ -29,34 +31,33 @@ cd portfolio
 java -jar target/portfolio-0.0.1-SNAPSHOT.jar
 ```
 
-## Configuration
+## Deploying
 
-| Property                | Env var                | Purpose                                             |
-|-------------------------|------------------------|-----------------------------------------------------|
-| `alphavantage.api.key`  | `ALPHAVANTAGE_API_KEY` | Key for the Alpha Vantage demo at `/alpha/{ticker}` |
+See [`portfolio/DEPLOY.md`](portfolio/DEPLOY.md) for Google Cloud Run (`Dockerfile` +
+`gcloud` steps + attaching `collinturner.com`).
 
-The `/alpha` route degrades gracefully (shows "no data") when the key is unset.
+## How it works
 
-## Routes
-
-| Path              | Page                                                        |
-|-------------------|------------------------------------------------------------|
-| `/`               | Home                                                       |
-| `/styleguide`     | Style guide — colors/fonts parsed live from `style.css`    |
-| `/test`           | Scratch page                                               |
-| `/alpha/{ticker}` | Alpha Vantage stock overview demo                          |
+- `IndexController` serves the IDE shell (`ide.html`) and renders the project tree from
+  the `ProjectStructure` bean.
+- Opening a file calls `GET /content?path=…`, which `ContentController` answers with a
+  Thymeleaf fragment (`templates/pages/**`) injected into a cached editor pane.
+- Open tabs, tab order, the active file, folder collapse state and panel width persist to
+  `localStorage`; every file is deep-linkable with `?file=…`.
+- `/styleguide` and `/test` remain as standalone pages; `.config/` in the tree surfaces
+  them inside the IDE.
 
 ## Layout
 
 ```
 portfolio/src/main/
 ├── java/com/collindturner/portfolio/
-│   ├── controller/   IndexController, StyleGuideController, AlphaClientController, TestController
-│   ├── service/      CSSService, ClassPathResourceService, AlphavantageService
-│   ├── model/        Result<T>, WebStyles, Stock, Todos
-│   ├── config/       CDTConfiguration
+│   ├── controller/   IndexController, ContentController, StyleGuideController, TestController
+│   ├── config/       ProjectStructure  (the project-tree definition)
+│   ├── service/      CSSService, ClassPathResourceService
+│   ├── model/        ProjectNode, Result<T>, WebStyles, Todos
 │   └── utils/        BaseProcessor (logging base class), CDTUtils
 └── resources/
-    ├── templates/    layouts/, fragments/, and one file per page
-    └── static/       css/, scripts/, images/
+    ├── templates/    ide.html, layouts/, fragments/, pages/**
+    └── static/       css/ (ide.css, style.css), scripts/ (ide.js, …), images/
 ```

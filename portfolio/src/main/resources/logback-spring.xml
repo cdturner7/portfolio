@@ -1,38 +1,21 @@
 <configuration>
-  <!-- properties -->
-  <property name="LOG_FILE" value="cdt" />
-  <property name="LOG_DIR" value="/logs" />
-  
-  <!-- stdout log appender -->
+
+  <!--
+    Console only. Cloud Run, Docker and `mvnw spring-boot:run` all capture stdout/stderr
+    straight into their log streams, so a file appender adds nothing - and on Cloud Run
+    the container filesystem is read-only apart from /tmp, so writing log files there would
+    only fail or waste memory.
+  -->
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%d{MM-dd-yyyy HH:mm:ss} %-5level %logger{0} - %msg%n</pattern>
     </encoder>
   </appender>
 
-  <!-- file log appender -->
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_DIR}/${LOG_FILE}.log</file>
-    <encoder>
-      <pattern>%d{MM-dd-yyyy HH:mm:ss} %-5level %logger{0} - %msg%n</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <!-- daily rollover -->
-      <fileNamePattern>${LOG_DIR}/${LOG_FILE}.%d{yy-MM-dd}.log</fileNamePattern>
-      <!-- keep 30 days' worth of history capped at 1GB total size -->
-      <maxHistory>30</maxHistory>
-      <totalSizeCap>1GB</totalSizeCap>
-    </rollingPolicy>
-  </appender>
-  
-  <!-- application logger -->
-  <logger name="com.collindturner" level="DEBUG">
-    <appender-ref ref="FILE" />
-  </logger>
+  <logger name="com.collindturner" level="DEBUG"/>
 
-  <!-- root logger -->
   <root level="INFO">
-    <appender-ref ref="STDOUT" />
+    <appender-ref ref="STDOUT"/>
   </root>
-  
+
 </configuration>

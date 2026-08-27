@@ -1,8 +1,8 @@
 # Deploying to Google Cloud Run
 
-The app is a stateless Spring Boot server with no database. Cloud Run runs it as a
-container, scales to zero when idle (so a personal-traffic portfolio costs ~nothing),
-and provides HTTPS + custom domains.
+The app is a stateless Spring Boot server with no database and no configuration. Cloud Run
+runs it as a container, scales to zero when idle (so a personal-traffic portfolio costs
+~nothing), and provides HTTPS + custom domains.
 
 ## One-time setup
 
@@ -14,10 +14,6 @@ and provides HTTPS + custom domains.
 2. Enable the APIs:
    ```
    gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
-   ```
-3. Store the Alpha Vantage key in Secret Manager (better than a plain env var):
-   ```
-   printf 'YOUR_ALPHAVANTAGE_KEY' | gcloud secrets create alphavantage-api-key --data-file=-
    ```
 
 ## Deploy
@@ -31,8 +27,7 @@ gcloud run deploy portfolio \
   --allow-unauthenticated \
   --memory 512Mi \
   --cpu 1 \
-  --min-instances 0 \
-  --set-secrets ALPHAVANTAGE_API_KEY=alphavantage-api-key:latest
+  --min-instances 0
 ```
 
 Cloud Build builds the image from the `Dockerfile`, pushes it to Artifact Registry, and
@@ -66,4 +61,4 @@ creates a Cloud Build trigger on push).
 - JVM flags for the small instance are baked into the image
   (`-XX:MaxRAMPercentage=75 -XX:+UseSerialGC`). Bump `--memory` to `1Gi` if you see OOMs.
 - Cold start after idle is ~2–4s. Set `--min-instances 1` (small always-on cost) to remove it.
-- Outbound calls to `alphavantage.co` work with no extra config (egress is open by default).
+- Logging is console-only (`logback-spring.xml`); Cloud Run ships stdout/stderr to Cloud Logging automatically.
