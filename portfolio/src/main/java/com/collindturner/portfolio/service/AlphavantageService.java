@@ -40,14 +40,24 @@ public class AlphavantageService extends BaseService {
 
     public Result<Stock> getStock(String ticker, String function) {
         Result<Stock> result = new Result<>();
+        if (apiKey == null || apiKey.isBlank()) {
+            result.setStatus(Result.Status.Error);
+            error("alphavantage.api.key is not configured; set the ALPHAVANTAGE_API_KEY environment variable.");
+            return result;
+        }
         try {
             Stock stock = alphaRestClient.get()
-                .uri("?function=" + function + "&symbol=" + ticker + "&apikey=" + apiKey)
+                .uri(uriBuilder -> uriBuilder
+                    .queryParam("function", function)
+                    .queryParam("symbol", ticker)
+                    .queryParam("apikey", apiKey)
+                    .build())
                 .retrieve()
                 .body(Stock.class);
             result.setData(stock);
         } catch (Exception e) {
-            getLogger().error(e.getLocalizedMessage());
+            result.setStatus(Result.Status.Error);
+            error(e.getLocalizedMessage());
         }
         return result;
     }

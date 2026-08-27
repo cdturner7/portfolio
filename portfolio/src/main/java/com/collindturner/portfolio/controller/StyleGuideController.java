@@ -12,6 +12,7 @@ package com.collindturner.portfolio.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.collindturner.portfolio.model.WebStyles;
 import com.collindturner.portfolio.service.CSSService;
 
 import org.springframework.stereotype.Controller;
@@ -29,8 +30,9 @@ public class StyleGuideController extends BaseController {
 
     @GetMapping
     public String displayStyleGuide(Model model) {
-        // save the root css variables to the model
-        model.addAttribute("variables", cssService.getRootVariables().getData());
+        // save the root css variables to the model, falling back to an empty set if parsing failed
+        WebStyles variables = cssService.getRootVariables().getData();
+        model.addAttribute("variables", variables != null ? variables : new WebStyles());
         return "style-guide";
     }
 

@@ -36,12 +36,17 @@ public class CSSService extends BaseService {
         try {
             // get the css file contents
             Result<String> cssContentResult = classPathResourceService.getFileContents(CSS_PATH);
+            if (!cssContentResult.isSuccessful() || cssContentResult.getData() == null) {
+                result.setStatus(Result.Status.Error);
+                return result;
+            }
             // Extract root variables using regex
             rootVariables = extractRootVariables(cssContentResult.getData());
             // add root variables to the result
             result.setData(rootVariables);
         } catch (Exception e) {
-            e.printStackTrace();
+            result.setStatus(Result.Status.Error);
+            error("Failed to parse root CSS variables: " + e.getLocalizedMessage());
         }
         return result;
     }

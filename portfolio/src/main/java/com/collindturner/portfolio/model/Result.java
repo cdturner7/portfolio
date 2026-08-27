@@ -1,9 +1,18 @@
+/*
+ *******************************************************************************
+ * Project: Portfolio Website
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2025 CollinDTurner All rights reserved.
+ *******************************************************************************
+*/
 package com.collindturner.portfolio.model;
 
 public class Result<T extends Object> {
 
-    enum Status {
-        Successful, 
+    public enum Status {
+        Successful,
         Error
     }
 
@@ -23,6 +32,10 @@ public class Result<T extends Object> {
         this.status = status;
     }
 
+    public boolean isSuccessful() {
+        return status == Status.Successful;
+    }
+
     public T getData() {
         return data;
     }
@@ -38,7 +51,7 @@ public class Result<T extends Object> {
         if (data != null) {
             stringBuilder.append("\n");
             stringBuilder.append(data.toString());
-        } 
+        }
         return stringBuilder.toString();
     }
 

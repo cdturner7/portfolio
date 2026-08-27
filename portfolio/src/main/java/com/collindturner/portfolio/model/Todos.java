@@ -1,3 +1,12 @@
+/*
+ *******************************************************************************
+ * Project: Portfolio Website
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2025 CollinDTurner All rights reserved.
+ *******************************************************************************
+*/
 package com.collindturner.portfolio.model;
 
 public class Todos {

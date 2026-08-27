@@ -1,7 +1,18 @@
+/*
+ *******************************************************************************
+ * Project: Portfolio Website
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2025 CollinDTurner All rights reserved.
+ *******************************************************************************
+*/
 package com.collindturner.portfolio.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Stock {
 
     @JsonProperty("Symbol")

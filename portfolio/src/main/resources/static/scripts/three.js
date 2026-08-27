@@ -18,7 +18,7 @@ class Three {
     constructor() {
         // get the container div
         this.container = $('#three-js-container');
-        if (!this.container) {
+        if (this.container.length === 0) {
             console.error('Container not found');
             return;
         }
@@ -94,51 +94,6 @@ class Three {
         this.animate();
     }
     
-    initThreeJS2() {
-        // Set up the scene
-        this.scene = new THREE.Scene();
-
-        // get the container size.. everything will need t scalle and size according to the room we have
-        let width = this.container.width();
-        let height = this.container.height();
-
-        // Set up the camera
-        this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-        this.camera.position.z = width / 2;
-        
-        // Set up the renderer
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(width, height);
-        this.container.append(this.renderer.domElement);
-
-        // background
-        const textureLoader = new THREE.TextureLoader();
-        const backgroundTexture = textureLoader.load('images/paper-texture-med.jpg');
-        const backgroundMaterial = new THREE.MeshStandardMaterial({
-            map: backgroundTexture,
-            color: 0x808010, // Gray overlay
-            roughness: 1
-        });
-        const backgroundGeometry = new THREE.PlaneGeometry(width, height);
-        this.background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-        this.background.receiveShadow = true; // Enable shadows on ground
-        this.scene.add(this.background);
-
-        // lighting
-        const ambientLight = new THREE.AmbientLight(0x404040);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 10, 5).normalize();
-        directionalLight.castShadow = true; // Enable shadows
-        this.scene.add(ambientLight, directionalLight);
-
-        // adjust canvas size on window resize
-        window.addEventListener('resize', () => this.onWindowResize());
-
-        // start the animation
-        this.animate();
-    }
-
     animate() {
         this.animationFrameID = requestAnimationFrame(this.animate.bind(this));
         this.renderer.render(this.scene, this.camera);
@@ -199,11 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Three.js is not loaded');
         return;
     }
-    // init js
-    new Three();
-});
-
-// load Three.js canvas on button click - NOT USED YET
-document.getElementById('loadThree').addEventListener('click', () => {
-    if (!scene) initThreeJS();
+    // only start if the page actually contains the container
+    if (document.getElementById('three-js-container')) {
+        new Three();
+    }
 });

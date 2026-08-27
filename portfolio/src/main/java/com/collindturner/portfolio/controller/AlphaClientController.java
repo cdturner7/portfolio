@@ -17,6 +17,9 @@ import com.collindturner.portfolio.service.AlphavantageService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.collindturner.portfolio.model.Result;
+import com.collindturner.portfolio.model.Stock;
+
 
 @Controller
 @RequestMapping("/alpha")
@@ -30,8 +33,12 @@ public class AlphaClientController extends BaseController {
 
     @GetMapping("/{ticker}")
     public String displayView(@PathVariable(required = true) String ticker, Model model) {
-        model.addAttribute("stockOverview", alphavantageService.getStock(ticker).getData().toString());
+        Result<Stock> stockResult = alphavantageService.getStock(ticker);
+        String overview = stockResult.isSuccessful() && stockResult.getData() != null
+            ? stockResult.getData().toString()
+            : "No data available for ticker '" + ticker + "'.";
+        model.addAttribute("stockOverview", overview);
         return "api-client";
     }
-    
+
 }
