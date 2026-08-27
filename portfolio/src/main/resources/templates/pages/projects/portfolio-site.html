@@ -1,0 +1,42 @@
+<!--/* Projects/portfolio-site.md - rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <h1>portfolio-site</h1>
+    <p>
+        This website. A portfolio that renders itself as the IntelliJ IDEA UI &mdash; project tree, editor
+        tabs, gutter, status bar and all &mdash; because a plain landing page felt like a missed opportunity.
+    </p>
+
+    <h2>Stack</h2>
+    <ul>
+        <li><strong>Spring Boot 3.5</strong> / Java 21, built with Maven.</li>
+        <li><strong>Thymeleaf</strong> with the layout dialect for the non-IDE surfaces.</li>
+        <li>A hand-rolled <strong>vanilla JavaScript</strong> shell &mdash; no framework, no jQuery.</li>
+        <li>One CSS file approximating the IntelliJ "New UI" dark theme.</li>
+    </ul>
+
+    <h2>How it works</h2>
+    <ul>
+        <li>The server renders the project tree from a <code>ProjectStructure</code> bean.</li>
+        <li>Opening a file <code>fetch()</code>es <code>/content?path=&hellip;</code>, which returns a Thymeleaf
+            fragment that gets injected into a cached editor pane.</li>
+        <li>Open tabs, order, the active file, folder collapse state and panel width all live in
+            <code>localStorage</code>; deep links use <code>?file=</code>.</li>
+        <li>Tabs drag to reorder, close on middle-click or <code>Ctrl/Cmd+W</code>, and the gutter line
+            numbers are generated to match content height.</li>
+    </ul>
+
+    <h2>Ideas still on the list</h2>
+    <ul>
+        <li>Split editor &mdash; drag a tab to the side to open a second pane.</li>
+        <li>A real "Search Everywhere" (double-shift) instead of the toolbar filter.</li>
+        <li>A bottom Terminal tool window that actually types back.</li>
+    </ul>
+
+    <hr/>
+    <p><a href="https://github.com/cdturner7/portfolio" target="_blank" rel="noopener">Browse the source &rarr;</a></p>
+</article>
+</body>
+</html>

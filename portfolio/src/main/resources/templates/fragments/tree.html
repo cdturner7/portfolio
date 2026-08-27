@@ -1,0 +1,31 @@
+<!--
+ * Recursive project-tree fragment for the IDE shell. Kept in its own template
+ * so the parameterised fragment is never rendered on its own.
+-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="treeNode(node, depth)">
+    <li th:if="${node.type.name() == 'FOLDER'}" class="tree-folder"
+        th:classappend="${node.collapsedByDefault} ? ' collapsed' : ''">
+        <div class="tree-row" th:style="|padding-left:${depth * 14 + 4}px|" th:attr="data-folder=${node.name}">
+            <span class="tree-chevron"></span>
+            <span class="tree-icon icon-folder"></span>
+            <span class="tree-label" th:text="${node.name}">folder</span>
+        </div>
+        <ul class="tree-children">
+            <th:block th:each="child : ${node.children}">
+                <th:block th:replace="~{fragments/tree :: treeNode(${child}, ${depth + 1})}"></th:block>
+            </th:block>
+        </ul>
+    </li>
+    <li th:if="${node.type.name() == 'FILE'}" class="tree-file"
+        th:attr="data-path=${node.path}, data-name=${node.name}, data-lang=${node.language}, data-icon=${node.iconType}">
+        <div class="tree-row" th:style="|padding-left:${depth * 14 + 20}px|">
+            <span class="tree-icon" th:classappend="|icon-${node.iconType}|"></span>
+            <span class="tree-label" th:text="${node.name}">file</span>
+        </div>
+    </li>
+</th:block>
+</body>
+</html>

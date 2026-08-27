@@ -1,0 +1,117 @@
+<!--
+ *******************************************************************************
+ * Project: Portfolio Website  -  IntelliJ-styled shell
+ *
+ * Author: Collin Turner
+ * =============================================================================
+ * (c) Copyright 2025 CollinDTurner All rights reserved.
+ *******************************************************************************
+-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Collin Turner &ndash; portfolio</title>
+    <meta name="description" content="Collin Turner's portfolio, built to look like the IntelliJ IDEA IDE."/>
+    <link rel="icon" th:href="@{/images/ide.png}"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"/>
+    <link rel="stylesheet" th:href="@{/css/ide.css}"/>
+</head>
+<body>
+
+<div class="ide">
+
+    <!-- ===== toolbar ===== -->
+    <header class="ide-toolbar">
+        <button class="tb-btn" id="tb-menu" title="Main menu" aria-label="Main menu">&#9776;</button>
+        <span class="tb-project" th:text="${root.name}">portfolio</span>
+        <span class="tb-vcs" id="tb-vcs" title="Git branch">
+            <svg viewBox="0 0 16 16"><path d="M5 3.5a2 2 0 1 0-2.6 1.9v5.2a2 2 0 1 0 1.2 0V8.9c.5.4 1.2.6 2 .6h1.5a2 2 0 1 0 0-1.2H5.6c-.9 0-1.6-.7-1.6-1.6V5.4A2 2 0 0 0 5 3.5Z"/></svg>
+            main
+        </span>
+        <div class="tb-spacer"></div>
+        <label class="tb-search" for="tb-search-input">
+            <svg viewBox="0 0 16 16"><path d="M7 2a5 5 0 0 1 3.9 8.1l3 3-1 1-3-3A5 5 0 1 1 7 2Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/></svg>
+            <input id="tb-search-input" type="text" placeholder="Search files&hellip;" autocomplete="off" spellcheck="false"/>
+        </label>
+        <button class="tb-btn tb-run" id="tb-run" title="Open README.md" aria-label="Open README">&#9654;</button>
+        <button class="tb-btn" id="tb-settings" title="Reset layout" aria-label="Reset layout">&#9881;</button>
+    </header>
+
+    <!-- ===== body ===== -->
+    <div class="ide-body">
+        <nav class="ide-stripe">
+            <button class="stripe-btn active" id="stripe-project" title="Project (Alt+1)">Project</button>
+            <button class="stripe-btn" title="Structure" disabled>Structure</button>
+            <div class="stripe-spacer"></div>
+            <button class="stripe-btn" title="Terminal" disabled>Terminal</button>
+        </nav>
+
+        <aside class="ide-project" id="ide-project">
+            <div class="panel-header"><span>Project</span></div>
+            <div class="panel-body">
+                <ul id="project-tree" class="tree">
+                    <li class="tree-folder tree-root">
+                        <div class="tree-row" style="padding-left:4px" data-folder="__root__">
+                            <span class="tree-chevron"></span>
+                            <span class="tree-icon icon-module"></span>
+                            <span class="tree-label" th:text="${root.name}">portfolio</span>
+                        </div>
+                        <ul class="tree-children">
+                            <th:block th:each="child : ${root.children}">
+                                <th:block th:replace="~{fragments/tree :: treeNode(${child}, 1)}"></th:block>
+                            </th:block>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <div class="ide-resizer" id="ide-resizer" title="Drag to resize"></div>
+
+        <main class="ide-editor">
+            <div class="editor-tabs" id="editor-tabs"></div>
+            <div class="editor-content" id="editor-content">
+                <div class="editor-scroll">
+                    <div class="gutter" id="gutter"></div>
+                    <div class="editor-panes" id="editor-panes"></div>
+                    <div class="welcome" id="welcome-screen">
+                        <div class="welcome-inner">
+                            <div class="welcome-logo">portfolio</div>
+                            <p class="welcome-sub">Collin Turner &mdash; Software Engineer</p>
+                            <div class="welcome-links">
+                                <button data-open="About.md">About.md</button>
+                                <button data-open="Experience.md">Experience.md</button>
+                                <button data-open="Projects/portfolio-site.md">portfolio-site.md</button>
+                                <button data-open="Contact.md">Contact.md</button>
+                            </div>
+                            <p class="welcome-hint">Open a file from the Project tool window on the left.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== status bar ===== -->
+    <footer class="ide-status">
+        <span class="st-item" title="Git branch">
+            <svg viewBox="0 0 16 16"><path d="M5 3.5a2 2 0 1 0-2.6 1.9v5.2a2 2 0 1 0 1.2 0V8.9c.5.4 1.2.6 2 .6h1.5a2 2 0 1 0 0-1.2H5.6c-.9 0-1.6-.7-1.6-1.6V5.4A2 2 0 0 0 5 3.5Z"/></svg>main
+        </span>
+        <div class="st-spacer"></div>
+        <span class="st-item" id="st-caret">1:1</span>
+        <span class="st-item" id="st-lang">&mdash;</span>
+        <span class="st-item">UTF-8</span>
+        <span class="st-item">LF</span>
+        <span class="st-item" id="st-file">no file</span>
+    </footer>
+
+</div>
+
+<script th:src="@{/scripts/ide.js}"></script>
+</body>
+</html>

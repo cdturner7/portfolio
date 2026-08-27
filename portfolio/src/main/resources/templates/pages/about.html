@@ -1,0 +1,45 @@
+<!--/* About.md - rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <div class="frontmatter">---
+name: Collin Turner
+role: Sr. Software &amp; Application Engineer
+location: Burlington, VT
+---</div>
+
+    <img class="headshot" th:src="@{/images/headshot-no-background.png}" alt="Collin Turner"/>
+
+    <h1>About</h1>
+    <p>
+        I'm <strong>Collin Turner</strong>, a software engineer based in Burlington, Vermont. Since 2020 I've
+        worked at <strong>GLOBALFOUNDRIES</strong> as a Senior Software &amp; Application Engineer, supporting a
+        broad suite of internal engineering applications and leading their move from on-prem servers into AWS.
+    </p>
+    <p>
+        Day to day that means shipping features and bug fixes across a large Java / Spring codebase, growing the
+        regression test suite alongside new development, standing up AWS infrastructure for our deployment
+        pipeline, and onboarding and training new hires. I also run the team's scrums in a loose Agile setup.
+    </p>
+
+    <h2>What I like building</h2>
+    <ul>
+        <li>Backend services in Java and Spring Boot, with a bias toward small, well-tested pieces.</li>
+        <li>Automation that removes a manual step someone does every week.</li>
+        <li>Developer-facing tooling &mdash; this site is an example, a Spring Boot app wearing an IDE costume.</li>
+    </ul>
+
+    <h2>Off the clock</h2>
+    <p>
+        Cyber-security rabbit holes (I picked up a certificate in it at UVM), 3D and creative-coding
+        experiments, and rebuilding this portfolio more times than strictly necessary.
+    </p>
+
+    <p>
+        <span class="tag">java</span><span class="tag">spring-boot</span><span class="tag">aws</span>
+        <span class="tag">postgresql</span><span class="tag">jenkins</span><span class="tag">linux</span>
+    </p>
+</article>
+</body>
+</html>

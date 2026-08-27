@@ -1,0 +1,39 @@
+<!--/* .config/style-guide.html - CSS :root variables parsed from style.css */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <h1>style-guide</h1>
+    <p>
+        Design tokens parsed live from <code>static/css/style.css</code> by <code>CSSService</code>. This is
+        the legacy style guide for the classic (non-IDE) pages, kept here under <code>.config/</code>.
+    </p>
+
+    <h2>Colors</h2>
+    <div class="sg-swatches">
+        <div class="sg-swatch" th:each="entry : ${variables.colors}">
+            <div class="chip" th:style="'background-color:' + ${entry.value}"></div>
+            <div class="meta">
+                <div th:text="${entry.key}">Name</div>
+                <div th:text="${entry.value}">#000</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Fonts</h2>
+    <ul>
+        <li th:each="entry : ${variables.fonts}">
+            <span th:text="${entry.key}">Name</span> &mdash;
+            <span th:style="'font-family:' + ${entry.value}" th:text="${entry.value}">family</span>
+        </li>
+    </ul>
+
+    <h2>Other tokens</h2>
+    <ul>
+        <li th:each="entry : ${variables.other}">
+            <code th:text="${entry.key}">--token</code>: <span th:text="${entry.value}">value</span>
+        </li>
+    </ul>
+</article>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!--/* README.md - default file, rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <h1>portfolio</h1>
+    <p>
+        Welcome. This is <strong>Collin Turner's</strong> portfolio &mdash; and yes, the whole site is dressed
+        up as <strong>IntelliJ IDEA</strong>. The panel on the left is the project tree; click a file and it
+        opens in a tab you can reorder or close.
+    </p>
+
+    <h2>Start here</h2>
+    <ul>
+        <li><code>About.md</code> &mdash; who I am and what I work on</li>
+        <li><code>Experience.md</code> &mdash; work history</li>
+        <li><code>Skills.json</code> &mdash; the tech, as a config file</li>
+        <li><code>Projects/</code> &mdash; things I've built, including this site</li>
+        <li><code>Contact.md</code> &mdash; how to reach me</li>
+    </ul>
+
+    <h2>About this build</h2>
+    <p>
+        A <strong>Spring Boot 3.5</strong> app (Java 21) serving <strong>Thymeleaf</strong> fragments over a
+        vanilla-JS editor shell. Each "file" is a fragment fetched on demand; open tabs, layout, and the
+        active file are kept in <code>localStorage</code>, so a refresh drops you back where you were. Every
+        file is also deep-linkable with <code>?file=</code>.
+    </p>
+
+    <blockquote>Tip: <code>Alt + W</code> closes the current tab (middle-click a tab works too). <code>Alt + 1</code> toggles the project panel. The gear icon resets the layout.</blockquote>
+
+    <hr/>
+    <p>Source: <a href="https://github.com/cdturner7/portfolio" target="_blank" rel="noopener">github.com/cdturner7/portfolio</a></p>
+</article>
+</body>
+</html>

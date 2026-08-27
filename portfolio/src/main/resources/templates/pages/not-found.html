@@ -1,0 +1,11 @@
+<!--/* served when /content is asked for an unknown path */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <h1>File not found</h1>
+    <p>No file is registered at <code th:text="${missingPath}">path</code>.</p>
+    <p>Open <code>README.md</code> from the project tree to get your bearings.</p>
+</article>
+</body>
+</html>
