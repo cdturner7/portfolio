@@ -47,14 +47,17 @@
     <div class="ide-body">
         <nav class="ide-stripe">
             <button class="stripe-btn active" id="stripe-project" title="Project (Alt+1)">Project</button>
-            <button class="stripe-btn" title="Structure" disabled>Structure</button>
+            <button class="stripe-btn" id="stripe-structure" title="Structure (Alt+7)">Structure</button>
             <div class="stripe-spacer"></div>
             <button class="stripe-btn" id="stripe-terminal" title="Terminal (Alt+F12)">Terminal</button>
         </nav>
 
         <aside class="ide-project" id="ide-project">
-            <div class="panel-header"><span>Project</span></div>
-            <div class="panel-body">
+            <div class="panel-header"><span id="panel-title">Project</span></div>
+            <div class="panel-body" id="structure-body" hidden>
+                <ul id="structure-list" class="structure"></ul>
+            </div>
+            <div class="panel-body" id="project-body">
                 <ul id="project-tree" class="tree">
                     <li class="tree-folder tree-root">
                         <div class="tree-row" style="padding-left:4px" data-folder="__root__">

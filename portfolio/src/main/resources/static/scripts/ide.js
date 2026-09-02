@@ -19,6 +19,7 @@
         collapsed: "ide.collapsedFolders",
         width: "ide.projectWidth",
         panel: "ide.projectOpen",
+        leftView: "ide.leftView",
         term: "ide.termOpen",
         termH: "ide.termHeight"
     };
@@ -289,6 +290,7 @@
         renderTreeSelection();
         showPane(path);
         updateStatus(path);
+        refreshStructureIfVisible();
         save();
         var url = new URL(window.location.href);
         url.searchParams.set("file", path);
@@ -325,7 +327,7 @@
                     contentLoaded[path] = true;
                     pane.innerHTML = html;
                     highlightCode(pane);
-                    if (state.active === path) updateGutter();
+                    if (state.active === path) { updateGutter(); refreshStructureIfVisible(); }
                 })
                 .catch(function () {
                     pane.innerHTML = '<div class="doc-error">Could not load "' + path + '".</div>';
@@ -364,6 +366,7 @@
         renderTabs();
         renderTreeSelection();
         updateStatus(null);
+        refreshStructureIfVisible();
         save();
         var url = new URL(window.location.href);
         url.searchParams.delete("file");
@@ -391,15 +394,95 @@
         gutterTimer = setTimeout(function () { if (state.active) updateGutter(); }, 120);
     });
 
-    // ------------------------------------------------------- project panel
+    // ------------------------------------------------- project / structure
+    var leftView = "project";                       // "project" | "structure"
+    var structureTargets = [];
+    var stripeProjectBtn = document.getElementById("stripe-project");
+    var stripeStructureBtn = document.getElementById("stripe-structure");
+    var structureList = document.getElementById("structure-list");
+
+    function panelOpen() { return !document.body.classList.contains("project-collapsed"); }
+
+    function syncStripe() {
+        var open = panelOpen();
+        stripeProjectBtn.classList.toggle("active", open && leftView === "project");
+        stripeStructureBtn.classList.toggle("active", open && leftView === "structure");
+    }
+
     function setProjectOpen(open) {
         document.body.classList.toggle("project-collapsed", !open);
-        document.getElementById("stripe-project").classList.toggle("active", open);
         try { localStorage.setItem(LS.panel, open ? "1" : "0"); } catch (e) {}
+        syncStripe();
     }
-    document.getElementById("stripe-project").addEventListener("click", function () {
-        setProjectOpen(document.body.classList.contains("project-collapsed"));
+
+    function setLeftView(view) {
+        leftView = view;
+        document.getElementById("panel-title").textContent = view === "structure" ? "Structure" : "Project";
+        document.getElementById("project-body").hidden = view !== "project";
+        document.getElementById("structure-body").hidden = view !== "structure";
+        try { localStorage.setItem(LS.leftView, view); } catch (e) {}
+        if (view === "structure") buildStructure();
+        syncStripe();
+    }
+
+    function toggleLeft(view) {
+        if (panelOpen() && leftView === view) {
+            setProjectOpen(false);
+        } else {
+            if (!panelOpen()) setProjectOpen(true);
+            setLeftView(view);
+        }
+    }
+
+    function buildStructure() {
+        structureList.innerHTML = "";
+        structureTargets = [];
+        var pane = state.active ? paneFor(state.active) : null;
+        var headings = pane ? pane.querySelectorAll("h1, h2, h3") : [];
+        if (!headings.length) {
+            var li = document.createElement("li");
+            li.className = "structure-empty";
+            li.textContent = state.active ? "No headings in this file" : "No file open";
+            structureList.appendChild(li);
+            return;
+        }
+        for (var i = 0; i < headings.length; i++) {
+            var h = headings[i];
+            structureTargets.push(h);
+            var row = document.createElement("li");
+            row.className = "structure-row lvl-" + h.tagName.charAt(1);
+            row.dataset.i = i;
+            var icon = document.createElement("span");
+            icon.className = "structure-icon";
+            var label = document.createElement("span");
+            label.className = "structure-label";
+            label.textContent = (h.textContent || "").trim();
+            row.appendChild(icon);
+            row.appendChild(label);
+            structureList.appendChild(row);
+        }
+    }
+
+    function refreshStructureIfVisible() {
+        if (leftView === "structure") buildStructure();
+    }
+
+    structureList.addEventListener("click", function (e) {
+        var row = e.target.closest(".structure-row");
+        if (!row) return;
+        var h = structureTargets[+row.dataset.i];
+        if (!h) return;
+        h.scrollIntoView({ behavior: "smooth", block: "start" });
+        h.classList.remove("structure-flash");
+        void h.offsetWidth;                        // restart the flash animation
+        h.classList.add("structure-flash");
+        setTimeout(function () { h.classList.remove("structure-flash"); }, 1200);
+        var rows = structureList.querySelectorAll(".structure-row");
+        for (var i = 0; i < rows.length; i++) rows[i].classList.toggle("selected", rows[i] === row);
     });
+
+    stripeProjectBtn.addEventListener("click", function () { toggleLeft("project"); });
+    stripeStructureBtn.addEventListener("click", function () { toggleLeft("structure"); });
 
     // resizer
     var resizing = false;
@@ -424,7 +507,7 @@
 
     // ------------------------------------------------------------- toolbar
     function resetLayout() {
-        [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.term, LS.termH].forEach(function (k) {
+        [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.leftView, LS.term, LS.termH].forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
         });
         window.location.href = window.location.pathname;
@@ -481,9 +564,8 @@
 
     function seActionList() {
         var acts = [
-            { label: "Toggle Project panel", key: "Alt+1", run: function () {
-                setProjectOpen(document.body.classList.contains("project-collapsed"));
-            } },
+            { label: "Toggle Project panel", key: "Alt+1", run: function () { toggleLeft("project"); } },
+            { label: "Toggle Structure panel", key: "Alt+7", run: function () { toggleLeft("structure"); } },
             { label: "Open README.md", key: "", run: function () { openFile(DEFAULT_FILE); } },
             { label: "Reset layout", key: "", run: resetLayout }
         ];
@@ -860,7 +942,10 @@
             closeTab(state.active);
         } else if (e.altKey && e.key === "1") {
             e.preventDefault();
-            setProjectOpen(document.body.classList.contains("project-collapsed"));
+            toggleLeft("project");
+        } else if (e.altKey && e.key === "7") {
+            e.preventDefault();
+            toggleLeft("structure");
         } else if (e.altKey && e.key === "F12") {
             e.preventDefault();
             setTermOpen(termPanel.hidden);
@@ -882,9 +967,14 @@
         try { storedWidth = localStorage.getItem(LS.width); } catch (e) {}
         if (storedWidth) document.documentElement.style.setProperty("--project-width", storedWidth);
 
-        var panelOpen = "1";
-        try { panelOpen = localStorage.getItem(LS.panel); } catch (e) {}
-        setProjectOpen(panelOpen === null ? true : panelOpen === "1");
+        var storedPanel = "1";
+        try { storedPanel = localStorage.getItem(LS.panel); } catch (e) {}
+
+        var storedView = null;
+        try { storedView = localStorage.getItem(LS.leftView); } catch (e) {}
+        leftView = storedView === "structure" ? "structure" : "project";
+        setLeftView(leftView);
+        setProjectOpen(storedPanel === null ? true : storedPanel === "1");
 
         var storedTermH = null;
         try { storedTermH = localStorage.getItem(LS.termH); } catch (e) {}
