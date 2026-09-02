@@ -37,6 +37,9 @@
     var paneHost = document.getElementById("editor-panes");
     var welcome = document.getElementById("welcome-screen");
     var gutter = document.getElementById("gutter");
+    var editorContent = document.getElementById("editor-content");
+    var caretLineEl = document.getElementById("caret-line");
+    var stCaret = document.getElementById("st-caret");
     var projectPanel = document.getElementById("ide-project");
     var resizer = document.getElementById("ide-resizer");
     var searchInput = document.getElementById("tb-search-input");
@@ -297,6 +300,7 @@
         renderTreeSelection();
         showPane(path);
         updateStatus(path);
+        resetCaret();
         refreshStructureIfVisible();
         save();
         var url = new URL(window.location.href);
@@ -373,6 +377,7 @@
         renderTabs();
         renderTreeSelection();
         updateStatus(null);
+        resetCaret();
         refreshStructureIfVisible();
         save();
         var url = new URL(window.location.href);
@@ -398,8 +403,78 @@
     var gutterTimer;
     window.addEventListener("resize", function () {
         clearTimeout(gutterTimer);
-        gutterTimer = setTimeout(function () { if (state.active) updateGutter(); }, 120);
+        gutterTimer = setTimeout(function () {
+            if (state.active) { updateGutter(); if (caret.active) positionCaretLine(); }
+        }, 120);
     });
+
+    // ------------------------------------------------- caret / go to line
+    var TOP_PAD = 14;                                   // matches .doc / .gutter padding-top
+    var caret = { line: 1, col: 1, active: false };
+    var gtlOverlay = document.getElementById("gtl-overlay");
+    var gtlInput = document.getElementById("gtl-input");
+
+    function maxLine() { return gutter.querySelectorAll("span").length || 1; }
+
+    function positionCaretLine() {
+        var lh = lineHeightPx();
+        caretLineEl.style.top = (TOP_PAD + (caret.line - 1) * lh) + "px";
+        caretLineEl.style.height = lh + "px";
+    }
+    function setCaret(line, col) {
+        caret.line = line;
+        caret.col = col;
+        caret.active = true;
+        stCaret.textContent = line + ":" + col;
+        positionCaretLine();
+        caretLineEl.hidden = false;
+    }
+    function resetCaret() {
+        caret = { line: 1, col: 1, active: false };
+        stCaret.textContent = "1:1";
+        caretLineEl.hidden = true;
+    }
+
+    function lineAtY(clientY) {
+        var n = Math.floor((clientY - paneHost.getBoundingClientRect().top - TOP_PAD) / lineHeightPx()) + 1;
+        return Math.min(Math.max(n, 1), maxLine());
+    }
+    function colAtPoint(x, y) {
+        var off = 0;
+        if (document.caretPositionFromPoint) {
+            var p = document.caretPositionFromPoint(x, y);
+            if (p) off = p.offset;
+        } else if (document.caretRangeFromPoint) {
+            var r = document.caretRangeFromPoint(x, y);
+            if (r) off = r.startOffset;
+        }
+        return off + 1;
+    }
+
+    editorContent.addEventListener("click", function (e) {
+        if (!state.active || !welcome.hidden) return;   // ignore clicks on the welcome screen
+        setCaret(lineAtY(e.clientY), colAtPoint(e.clientX, e.clientY));
+    });
+
+    function gtlOpen() {
+        if (!state.active) return;
+        gtlInput.value = caret.line || 1;
+        gtlOverlay.hidden = false;
+        gtlInput.focus();
+        gtlInput.select();
+    }
+    function gtlClose() { gtlOverlay.hidden = true; }
+    function gotoLine(line) {
+        line = Math.min(Math.max(line | 0, 1), maxLine());
+        var lh = lineHeightPx();
+        editorContent.scrollTop = Math.max(0, TOP_PAD + (line - 1) * lh - lh * 3);
+        setCaret(line, 1);
+    }
+    gtlInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); gotoLine(parseInt(this.value, 10) || 1); gtlClose(); }
+        else if (e.key === "Escape") { e.preventDefault(); gtlClose(); }
+    });
+    gtlOverlay.addEventListener("mousedown", function (e) { if (e.target === gtlOverlay) gtlClose(); });
 
     // ------------------------------------------------- project / structure
     var leftView = "project";                       // "project" | "structure"
@@ -574,10 +649,12 @@
         var acts = [
             { label: "Toggle Project panel", key: "Alt+1", run: function () { toggleLeft("project"); } },
             { label: "Toggle Structure panel", key: "Alt+7", run: function () { toggleLeft("structure"); } },
+            { label: "Settings", key: "Ctrl+Alt+S", run: cfgOpen },
             { label: "Open README.md", key: "", run: function () { openFile(DEFAULT_FILE); } },
             { label: "Reset layout", key: "", run: resetLayout }
         ];
         if (state.active) {
+            acts.push({ label: "Go to line…", key: "Ctrl+G", run: gtlOpen });
             acts.push({ label: "Close active tab", key: "Alt+W", run: function () { closeTab(state.active); } });
             acts.push({ label: "Close all tabs", key: "", run: function () {
                 state.tabs.slice().forEach(function (t) { closeTab(t.path); });
@@ -963,7 +1040,7 @@
         root.style.setProperty("--editor-font", cfg.fontSize + "px");
         root.style.setProperty("--editor-lh", String(cfg.lineHeight));
         document.body.classList.toggle("presentation", cfg.presentation);
-        if (state.active) updateGutter();
+        if (state.active) { updateGutter(); if (caret.active) positionCaretLine(); }
         syncCfgControls();
     }
 
@@ -997,12 +1074,19 @@
 
         if (e.defaultPrevented) return;                // already handled (e.g. a modal)
         if (!cfgOverlay.hidden) return;                // settings dialog owns its keys
+        if (!gtlOverlay.hidden) return;                // go-to-line owns its keys
         if (!seOverlay.hidden) return;                 // modal owns its keys while open
 
         // Ctrl/Cmd+Alt+S opens Settings
         if (mod && e.altKey && e.key.toLowerCase() === "s") {
             e.preventDefault();
             cfgOpen();
+            return;
+        }
+        // Ctrl/Cmd+G opens Go to line
+        if (mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "g") {
+            e.preventDefault();
+            gtlOpen();
             return;
         }
         // Esc leaves presentation mode

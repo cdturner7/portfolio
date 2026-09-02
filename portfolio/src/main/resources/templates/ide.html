@@ -82,6 +82,7 @@
             <div class="editor-content" id="editor-content">
                 <div class="editor-scroll">
                     <div class="gutter" id="gutter"></div>
+                    <div class="caret-line" id="caret-line" hidden></div>
                     <div class="editor-panes" id="editor-panes"></div>
                     <div class="welcome" id="welcome-screen">
                         <div class="welcome-inner">
@@ -184,6 +185,14 @@
     </div>
 
     <button class="pres-exit" id="pres-exit" type="button"><kbd>Esc</kbd> exit presentation</button>
+
+    <!-- ===== go to line (Ctrl+G) ===== -->
+    <div class="gtl-overlay" id="gtl-overlay" hidden>
+        <div class="gtl-box" role="dialog" aria-modal="true" aria-label="Go to line">
+            <label for="gtl-input">Go to line</label>
+            <input id="gtl-input" type="number" min="1" autocomplete="off" spellcheck="false"/>
+        </div>
+    </div>
 
     <!-- ===== status bar ===== -->
     <footer class="ide-status">

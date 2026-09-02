@@ -49,6 +49,7 @@
     --code-bg:       #2b2d30;
     --code-bg-block: #26282e;
     --gutter-fg:     #4b5059;
+    --caret-line-bg: rgba(255, 255, 255, .05);
 
     --ui-font:   "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
     --mono-font: "JetBrains Mono", "SF Mono", "Consolas", "Liberation Mono", monospace;
@@ -94,6 +95,7 @@
     --code-bg:       #f0f1f3;
     --code-bg-block: #f7f8fa;
     --gutter-fg:     #a8adb8;
+    --caret-line-bg: rgba(0, 0, 0, .045);
 }
 
 /* ---- High contrast ------------------------------------------------------ */
@@ -129,6 +131,7 @@
     --code-bg:       #1a1a1a;
     --code-bg-block: #141414;
     --gutter-fg:     #6a6a6a;
+    --caret-line-bg: rgba(255, 255, 255, .09);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -545,7 +548,17 @@ body.project-collapsed .ide-resizer { display: none; }
 .gutter span { display: block; padding-right: 14px; }
 .gutter.hidden { display: none; }
 
-.editor-panes { margin-left: var(--gutter-w); min-height: 200px; }
+.caret-line {
+    position: absolute;
+    left: var(--gutter-w);
+    right: 0;
+    z-index: 0;
+    background: var(--caret-line-bg);
+    pointer-events: none;
+}
+.caret-line[hidden] { display: none; }
+
+.editor-panes { position: relative; z-index: 1; margin-left: var(--gutter-w); min-height: 200px; }
 .editor-doc[hidden] { display: none; }
 
 /* ============================================================ document styling */
@@ -1025,6 +1038,41 @@ body.project-collapsed .ide-resizer { display: none; }
     font-size: 12.5px;
 }
 .cfg-done:hover { filter: brightness(1.08); }
+
+/* ---- go to line (Ctrl+G) ---- */
+.gtl-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 16vh;
+    background: rgba(0, 0, 0, .3);
+}
+.gtl-overlay[hidden] { display: none; }
+.gtl-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--ide-bg-panel);
+    border: 1px solid var(--ide-border);
+    border-radius: 8px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, .5);
+    font-size: 12.5px;
+    color: var(--ide-fg);
+}
+.gtl-box input {
+    width: 88px;
+    background: var(--ide-bg);
+    border: 1px solid var(--ide-border);
+    border-radius: 5px;
+    padding: 4px 8px;
+    color: var(--ide-fg);
+    font: inherit;
+}
+.gtl-box input:focus { outline: 0; border-color: var(--ide-accent); }
 
 /* ---- presentation mode ---- */
 .pres-exit {
