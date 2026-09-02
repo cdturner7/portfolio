@@ -18,7 +18,9 @@
         active: "ide.activeTab",
         collapsed: "ide.collapsedFolders",
         width: "ide.projectWidth",
-        panel: "ide.projectOpen"
+        panel: "ide.projectOpen",
+        term: "ide.termOpen",
+        termH: "ide.termHeight"
     };
 
     // -- dom ------------------------------------------------------------------
@@ -422,7 +424,7 @@
 
     // ------------------------------------------------------------- toolbar
     function resetLayout() {
-        [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel].forEach(function (k) {
+        [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.term, LS.termH].forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
         });
         window.location.href = window.location.pathname;
@@ -619,6 +621,219 @@
         if (e.target === seOverlay) seClose();
     });
 
+    // ----------------------------------------------------------- terminal
+    var termPanel = document.getElementById("ide-bottom");
+    var termEl = document.getElementById("term");
+    var termOut = document.getElementById("term-output");
+    var termInput = document.getElementById("term-input");
+    var stripeTerminal = document.getElementById("stripe-terminal");
+    var termHistory = [];
+    var termHistIdx = 0;
+    var termReady = false;
+
+    // snapshot of `git log` - refreshed by hand when it drifts too far
+    var GIT_LOG = [
+        { h: "9eb80e4", d: "2026-09-01", s: "Syntax-highlight code panes; Skills.json is now real JSON" },
+        { h: "6beda7c", d: "2026-09-01", s: "Add TODO backlog page; implement Search Everywhere (Double-Shift)" },
+        { h: "74b4b53", d: "2026-08-27", s: "DEPLOY.md: record live URL/project and the run-from-portfolio/ gotcha" },
+        { h: "31015d4", d: "2026-08-27", s: "Remove stock/Alpha Vantage feature; upgrade to Spring Boot 4.1.1" },
+        { h: "646b1aa", d: "2026-08-27", s: "Add Cloud Run deployment setup" },
+        { h: "8ba0731", d: "2026-08-26", s: "Reskin the site as the IntelliJ IDEA (New UI dark) IDE" }
+    ];
+
+    function termScroll() { termEl.scrollTop = termEl.scrollHeight; }
+    function termWrite(html, cls) {
+        var div = document.createElement("div");
+        if (cls) div.className = cls;
+        div.innerHTML = html;
+        termOut.appendChild(div);
+    }
+    function termEcho(line) {
+        termWrite('<span class="term-prompt">collin@portfolio:~$</span> <span class="cmd">' + escapeHtml(line) + '</span>');
+    }
+    function termResolve(arg) {
+        if (!arg) return null;
+        var a = arg.toLowerCase();
+        var keys = Object.keys(fileIndex);
+        for (var i = 0; i < keys.length; i++) {
+            if (keys[i].toLowerCase() === a || fileIndex[keys[i]].name.toLowerCase() === a) return keys[i];
+        }
+        return null;
+    }
+
+    var TERM_CMDS = {
+        help: function () {
+            termWrite(
+                "commands:\n" +
+                "  help            this list\n" +
+                "  whoami          the short version\n" +
+                "  ls              list the project files\n" +
+                "  cat &lt;file&gt;      print a file as plain text\n" +
+                "  open &lt;file&gt;     open a file in the editor\n" +
+                "  git log         recent commits\n" +
+                "  resume          contact card + headline\n" +
+                "  echo &lt;text&gt;     print text\n" +
+                "  date            current date/time\n" +
+                "  pwd             working directory\n" +
+                "  clear           clear the terminal  (Ctrl+L)",
+                "term-block muted"
+            );
+        },
+        whoami: function () {
+            termWrite(
+                "collin - senior software &amp; application engineer, Burlington VT.\n" +
+                "Java / Spring Boot, AWS migrations, regression testing, mentoring.",
+                "term-block"
+            );
+        },
+        pwd: function () { termWrite("/home/collin/portfolio"); },
+        date: function () { termWrite(escapeHtml(new Date().toString())); },
+        echo: function (args) { termWrite(escapeHtml(args.join(" "))); },
+        ls: function () {
+            var folders = {}, roots = [];
+            Object.keys(fileIndex).forEach(function (k) {
+                var slash = k.indexOf("/");
+                if (slash === -1) roots.push(k);
+                else folders[k.slice(0, slash)] = true;
+            });
+            var cells = Object.keys(folders).map(function (f) {
+                return '<span class="accent">' + escapeHtml(f) + "/</span>";
+            }).concat(roots.map(escapeHtml));
+            termWrite(cells.join("   "), "term-block");
+        },
+        cat: function (args) {
+            var key = termResolve(args[0]);
+            if (!key) { termWrite("cat: " + escapeHtml(args[0] || "") + ": No such file or directory", "err"); return; }
+            var box = document.createElement("div");
+            box.className = "term-block muted";
+            box.textContent = "loading…";
+            termOut.appendChild(box);
+            fetch("content?path=" + encodeURIComponent(key), { headers: { "X-Requested-With": "fetch" } })
+                .then(function (r) { return r.text(); })
+                .then(function (h) {
+                    var tmp = document.createElement("div");
+                    tmp.innerHTML = h;
+                    var text = (tmp.textContent || "").replace(/\n{3,}/g, "\n\n").replace(/^\s+|\s+$/g, "");
+                    box.className = "term-block";
+                    box.textContent = text || "(empty)";
+                    termScroll();
+                })
+                .catch(function () { box.className = "err"; box.textContent = "cat: could not read " + key; });
+        },
+        open: function (args) {
+            var key = termResolve(args[0]);
+            if (!key) { termWrite("open: " + escapeHtml(args[0] || "") + ": no such file", "err"); return; }
+            openFile(key);
+            termWrite('opened <span class="accent">' + escapeHtml(fileIndex[key].name) + "</span> in the editor", "muted");
+        },
+        resume: function () {
+            termWrite(
+                "Collin Turner - Senior Software &amp; Application Engineer\n" +
+                "GLOBALFOUNDRIES · Essex Junction, VT · 2020-present\n\n" +
+                '  email    <a href="mailto:collin.turn@gmail.com">collin.turn@gmail.com</a>\n' +
+                '  github   <a href="https://github.com/cdturner7" target="_blank" rel="noopener">github.com/cdturner7</a>\n' +
+                "  where    Burlington, VT\n\n" +
+                "Run `open Experience.md` for the full history.",
+                "term-block"
+            );
+        },
+        clear: function () { termOut.innerHTML = ""; },
+        git: function (args) {
+            if (args[0] === "log") {
+                termWrite(GIT_LOG.map(function (c) {
+                    return '<span class="accent">' + c.h + "</span>  " + escapeHtml(c.s)
+                        + ' <span class="muted">(' + c.d + ")</span>";
+                }).join("\n"), "term-block");
+            } else if (args[0] === "status") {
+                termWrite("On branch main\nnothing to commit, working tree clean", "term-block muted");
+            } else {
+                termWrite("git: '" + escapeHtml(args[0] || "") + "' is not a command this shell knows", "err");
+            }
+        }
+    };
+
+    function termRun(line) {
+        var parts = line.trim().split(/\s+/);
+        var cmd = parts.shift();
+        if (!cmd) return;
+        termHistory.push(line);
+        termHistIdx = termHistory.length;
+        var fn = TERM_CMDS[cmd];
+        if (fn) fn(parts);
+        else termWrite(escapeHtml(cmd) + ": command not found - try `help`", "err");
+    }
+
+    function termBanner() {
+        if (termReady) return;
+        termReady = true;
+        termWrite(
+            "portfolio shell - a toy, but it types back.\n" +
+            'Type <span class="accent">help</span> for commands.',
+            "term-block muted"
+        );
+    }
+
+    function setTermOpen(open) {
+        termPanel.hidden = !open;
+        stripeTerminal.classList.toggle("active", open);
+        try { localStorage.setItem(LS.term, open ? "1" : "0"); } catch (e) {}
+        if (open) {
+            termBanner();
+            termInput.focus();
+            termScroll();
+        }
+    }
+
+    stripeTerminal.addEventListener("click", function () { setTermOpen(termPanel.hidden); });
+    document.getElementById("bottom-close").addEventListener("click", function () { setTermOpen(false); });
+
+    termEl.addEventListener("mousedown", function (e) {
+        if (e.target === termInput) return;
+        setTimeout(function () { if (!String(window.getSelection())) termInput.focus(); }, 0);
+    });
+    termInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            var line = termInput.value;
+            termEcho(line);
+            termInput.value = "";
+            termRun(line);
+            termScroll();
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (termHistIdx > 0) { termHistIdx--; termInput.value = termHistory[termHistIdx] || ""; }
+        } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (termHistIdx < termHistory.length - 1) { termHistIdx++; termInput.value = termHistory[termHistIdx] || ""; }
+            else { termHistIdx = termHistory.length; termInput.value = ""; }
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
+            e.preventDefault();
+            TERM_CMDS.clear();
+        } else if (e.key === "Escape") {
+            setTermOpen(false);
+        }
+    });
+
+    var bottomResizer = document.getElementById("bottom-resizer");
+    var termResizing = false;
+    bottomResizer.addEventListener("pointerdown", function (e) {
+        termResizing = true;
+        bottomResizer.classList.add("dragging");
+        bottomResizer.setPointerCapture(e.pointerId);
+    });
+    bottomResizer.addEventListener("pointermove", function (e) {
+        if (!termResizing) return;
+        var h = Math.min(Math.max(termPanel.getBoundingClientRect().bottom - e.clientY, 120),
+                         Math.round(window.innerHeight * 0.7));
+        document.documentElement.style.setProperty("--bottom-h", h + "px");
+    });
+    bottomResizer.addEventListener("pointerup", function (e) {
+        termResizing = false;
+        bottomResizer.classList.remove("dragging");
+        bottomResizer.releasePointerCapture(e.pointerId);
+        var h = getComputedStyle(document.documentElement).getPropertyValue("--bottom-h").trim();
+        try { localStorage.setItem(LS.termH, h); } catch (err) {}
+    });
+
     // ------------------------------------------------------------ keyboard
     document.addEventListener("keydown", function (e) {
         var mod = e.ctrlKey || e.metaKey;
@@ -646,6 +861,9 @@
         } else if (e.altKey && e.key === "1") {
             e.preventDefault();
             setProjectOpen(document.body.classList.contains("project-collapsed"));
+        } else if (e.altKey && e.key === "F12") {
+            e.preventDefault();
+            setTermOpen(termPanel.hidden);
         } else if (mod && e.shiftKey && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
             if (!state.tabs.length) return;
             e.preventDefault();
@@ -667,6 +885,14 @@
         var panelOpen = "1";
         try { panelOpen = localStorage.getItem(LS.panel); } catch (e) {}
         setProjectOpen(panelOpen === null ? true : panelOpen === "1");
+
+        var storedTermH = null;
+        try { storedTermH = localStorage.getItem(LS.termH); } catch (e) {}
+        if (storedTermH) document.documentElement.style.setProperty("--bottom-h", storedTermH);
+
+        var termOpen = null;
+        try { termOpen = localStorage.getItem(LS.term); } catch (e) {}
+        if (termOpen === "1") setTermOpen(true);
 
         // restore open tabs
         var storedPaths = readJSON(LS.tabs, []);

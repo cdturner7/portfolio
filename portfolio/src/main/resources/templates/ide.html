@@ -43,12 +43,13 @@
     </header>
 
     <!-- ===== body ===== -->
+    <div class="ide-main">
     <div class="ide-body">
         <nav class="ide-stripe">
             <button class="stripe-btn active" id="stripe-project" title="Project (Alt+1)">Project</button>
             <button class="stripe-btn" title="Structure" disabled>Structure</button>
             <div class="stripe-spacer"></div>
-            <button class="stripe-btn" title="Terminal" disabled>Terminal</button>
+            <button class="stripe-btn" id="stripe-terminal" title="Terminal (Alt+F12)">Terminal</button>
         </nav>
 
         <aside class="ide-project" id="ide-project">
@@ -95,6 +96,27 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- ===== bottom tool window: Terminal ===== -->
+    <section class="ide-bottom" id="ide-bottom" hidden aria-label="Terminal tool window">
+        <div class="bottom-resizer" id="bottom-resizer" title="Drag to resize"></div>
+        <div class="bottom-tabs">
+            <button class="bottom-tab active" type="button">Terminal</button>
+            <div class="bottom-spacer"></div>
+            <button class="bottom-close" id="bottom-close" type="button" title="Hide (Alt+F12)" aria-label="Hide terminal">&times;</button>
+        </div>
+        <div class="bottom-body">
+            <div class="term" id="term">
+                <div class="term-output" id="term-output"></div>
+                <div class="term-inputline">
+                    <span class="term-prompt">collin@portfolio:~$</span>
+                    <input id="term-input" class="term-input" type="text" autocomplete="off"
+                           autocapitalize="off" spellcheck="false" aria-label="Terminal input"/>
+                </div>
+            </div>
+        </div>
+    </section>
     </div>
 
     <!-- ===== search everywhere (double-shift) ===== -->

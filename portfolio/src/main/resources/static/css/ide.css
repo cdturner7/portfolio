@@ -143,8 +143,14 @@ input  { font-family: inherit; }
 .tb-search input::placeholder { color: var(--ide-fg-faint); }
 
 /* ============================================================ body */
+.ide-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
 .ide-body {
     display: flex;
+    flex: 1;
     min-height: 0;
     background: var(--ide-bg);
 }
@@ -624,6 +630,96 @@ body.project-collapsed .ide-resizer { display: none; }
     border: 1px solid var(--ide-border);
     border-radius: 3px;
     padding: 0 4px;
+}
+
+/* ============================================================ bottom tool window */
+.ide-bottom {
+    position: relative;
+    flex: none;
+    height: var(--bottom-h, 240px);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--ide-bg-editor);
+    border-top: 1px solid var(--ide-border-strong);
+}
+.ide-bottom[hidden] { display: none; }
+
+.bottom-resizer {
+    position: absolute;
+    top: -3px; left: 0; right: 0;
+    height: 6px;
+    cursor: row-resize;
+    z-index: 5;
+}
+.bottom-resizer:hover, .bottom-resizer.dragging { background: var(--ide-accent); opacity: .4; }
+
+.bottom-tabs {
+    display: flex;
+    align-items: stretch;
+    height: 30px;
+    flex: none;
+    background: var(--ide-bg-panel);
+    border-bottom: 1px solid var(--ide-border-strong);
+    -webkit-user-select: none;
+    user-select: none;
+}
+.bottom-tab {
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 12px;
+    color: var(--ide-fg-dim);
+    border-right: 1px solid var(--ide-border-strong);
+    position: relative;
+}
+.bottom-tab.active { color: var(--ide-fg); background: var(--ide-bg-editor); }
+.bottom-tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: var(--ide-accent);
+}
+.bottom-spacer { flex: 1; }
+.bottom-close {
+    width: 30px;
+    color: var(--ide-fg-faint);
+    font-size: 16px;
+    line-height: 1;
+}
+.bottom-close:hover { background: var(--ide-hover); color: var(--ide-fg); }
+
+.bottom-body { flex: 1; min-height: 0; overflow: hidden; }
+
+/* ============================================================ terminal */
+.term {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    overflow-y: auto;
+    font: 400 12.5px/1.5 var(--mono-font);
+    color: var(--ide-fg-editor);
+}
+.term-output { white-space: pre-wrap; word-break: break-word; }
+.term-output .cmd   { color: var(--ide-fg); }
+.term-output .err   { color: #e2696b; }
+.term-output .muted { color: var(--ide-fg-faint); }
+.term-output .accent { color: var(--syn-func); }
+.term-output a { color: var(--syn-func); text-decoration: none; }
+.term-output a:hover { text-decoration: underline; }
+.term-block { margin: 2px 0 8px; }
+.term-inputline { display: flex; align-items: baseline; gap: 8px; }
+.term-prompt { flex: none; color: var(--ide-run); }
+.term-input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0;
+    outline: 0;
+    color: var(--ide-fg);
+    font: inherit;
 }
 
 /* ============================================================ search everywhere */
