@@ -35,6 +35,7 @@ public class ProjectStructure {
         root.add(ProjectNode.file("Skills.json", "Skills.json", "json", "JSON", "pages/skills :: content"));
         root.add(ProjectNode.file("Contact.md", "Contact.md", "md", "Markdown", "pages/contact :: content"));
         root.add(ProjectNode.file("README.md", "README.md", "md", "Markdown", "pages/readme :: content"));
+        root.add(ProjectNode.file("TODO.md", "TODO.md", "md", "Markdown", "pages/todo :: content"));
 
         ProjectNode projects = ProjectNode.folder("Projects");
         projects.add(ProjectNode.file("portfolio-site.md", "Projects/portfolio-site.md", "md", "Markdown",

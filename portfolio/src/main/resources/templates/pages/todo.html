@@ -1,0 +1,95 @@
+<!--/* TODO.md - working backlog for the portfolio project, rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <div class="frontmatter">---
+purpose: implementation backlog
+rule: when asked to "do the next thing", take the top unchecked item under "Next up"
+---</div>
+
+    <h1>TODO</h1>
+    <p>
+        Working backlog for this project. Items are roughly ordered by impact. When an item ships,
+        check it off here and move it under <strong>Done</strong> with a one-line note.
+    </p>
+
+    <h2>Next up</h2>
+    <ul class="todo">
+        <li><code>[x]</code> <strong>Search Everywhere (Double&#8209;Shift)</strong> &mdash; centered modal that
+            fuzzy&#8209;searches files <em>and</em> actions; <code>Ctrl/Cmd+Shift+A</code> opens it in
+            actions&#8209;only mode. Arrow keys + Enter to run, Esc to dismiss.</li>
+        <li><code>[ ]</code> <strong>Syntax highlighting in editor panes</strong> &mdash; real token colours for
+            code content, starting with <code>Skills.json</code>. Reuse the <code>--syn-*</code> variables.</li>
+        <li><code>[ ]</code> <strong>Terminal tool window</strong> &mdash; enable the disabled Terminal button;
+            a fake shell that types back: <code>help</code>, <code>whoami</code>, <code>ls</code>,
+            <code>cat</code>, <code>open &lt;file&gt;</code>, <code>git log</code>, <code>resume</code>,
+            <code>clear</code>.</li>
+        <li><code>[ ]</code> <strong>Structure tool window</strong> &mdash; enable the disabled Structure
+            button; outline the active file from its <code>h2</code>/<code>h3</code> headings and scroll to
+            them on click.</li>
+        <li><code>[ ]</code> <strong>Settings dialog</strong> &mdash; replace the gear&rsquo;s reset&#8209;only
+            behaviour with an IntelliJ&#8209;style modal: theme, font size, line height, presentation mode.
+            Keep &ldquo;Reset layout&rdquo; as one row inside it.</li>
+        <li><code>[ ]</code> <strong>Theme switching</strong> &mdash; Darcula (current), IntelliJ Light, and a
+            high&#8209;contrast option, persisted to <code>localStorage</code>.</li>
+        <li><code>[ ]</code> <strong>Live caret + Go to line</strong> &mdash; the status bar
+            <code>1:1</code> is static; track the caret on click in a pane, highlight the current line, add
+            <code>Ctrl+G</code>.</li>
+        <li><code>[ ]</code> <strong>Recent Files popup (<code>Ctrl+E</code>) and breadcrumbs</strong> &mdash;
+            recent-files list, plus a <code>portfolio &rsaquo; Projects &rsaquo; portfolio-site.md</code> bar
+            under the tabs.</li>
+        <li><code>[ ]</code> <strong>Right&#8209;click context menus</strong> &mdash; on tree rows and tabs:
+            Copy Path, Close Others, Close All, Split Right.</li>
+        <li><code>[ ]</code> <strong>Bottom tool&#8209;window bar</strong> &mdash; Problems / TODO (parsed from
+            this file) / Git log / Terminal.</li>
+        <li><code>[ ]</code> <strong>Notification toasts</strong> &mdash; &ldquo;Indexing finished&rdquo;,
+            &ldquo;Build succeeded in 2s&rdquo; on load.</li>
+        <li><code>[ ]</code> <strong>Shortcuts overlay (<code>?</code> / <code>F1</code>)</strong> &mdash;
+            lists every key the shell supports.</li>
+        <li><code>[ ]</code> <strong>Mobile fallback</strong> &mdash; collapse the tree into a drawer, editor
+            full&#8209;width, below ~640px.</li>
+        <li><code>[ ]</code> <strong>Hash routing</strong> &mdash; <code>#/Experience.md</code> with working
+            browser back/forward instead of only <code>?file=</code>.</li>
+    </ul>
+
+    <h2>Content</h2>
+    <ul class="todo">
+        <li><code>[ ]</code> <strong>More projects</strong> &mdash; 3&ndash;5 entries under <code>Projects/</code>,
+            each with problem / stack / role / outcome / links.</li>
+        <li><code>[ ]</code> <strong>Resume.pdf tree entry</strong> &mdash; opens an embedded PDF pane or
+            downloads; build from the existing <code>resume.html</code> fragment.</li>
+        <li><code>[ ]</code> <strong>Skills.json as real structured JSON</strong> &mdash; categories,
+            proficiency, years; collapsible nodes.</li>
+        <li><code>[ ]</code> <strong>Contact form that sends</strong> &mdash; server&#8209;side handler (or
+            mailto fallback) plus GitHub / LinkedIn / email / Calendly links.</li>
+        <li><code>[ ]</code> <strong>notes/ or blog folder</strong> &mdash; 2&ndash;3 short technical
+            write&#8209;ups.</li>
+        <li><code>[ ]</code> <strong>On&#8209;theme extras</strong> &mdash; <code>CHANGELOG.md</code>, a
+            <code>pom.xml</code>/<code>package.json</code> &ldquo;dependencies&rdquo; file listing the real
+            toolchain, a CI badge for the Cloud Run pipeline.</li>
+        <li><code>[ ]</code> <strong>&ldquo;Now&rdquo; / &ldquo;Uses&rdquo; page</strong> &mdash; current
+            focus, editor / hardware / dotfiles.</li>
+        <li><code>[ ]</code> <strong>Quantified experience bullets</strong> &mdash; per&#8209;role tech tags
+            and dates.</li>
+    </ul>
+
+    <h2>Polish</h2>
+    <ul class="todo">
+        <li><code>[ ]</code> <strong>SEO</strong> &mdash; OG image, meta tags, <code>sitemap.xml</code>,
+            <code>robots.txt</code>.</li>
+        <li><code>[ ]</code> <strong>Analytics</strong> &mdash; privacy&#8209;friendly (e.g. Plausible).</li>
+        <li><code>[ ]</code> <strong>Accessibility</strong> &mdash; keyboard nav for the tree, ARIA roles,
+            visible focus rings, <code>prefers-reduced-motion</code>.</li>
+    </ul>
+
+    <h2>Done</h2>
+    <ul class="todo">
+        <li><code>[x]</code> <strong>Search Everywhere (Double&#8209;Shift)</strong> &mdash; shipped
+            2026&#8209;09&#8209;01. Modal in <code>ide.html</code>, styles in <code>ide.css</code>, behaviour
+            in <code>ide.js</code> (<code>seOpen</code> / <code>seRender</code> / fuzzy matcher). Double&#8209;Shift
+            for all, <code>Ctrl/Cmd+Shift+A</code> for actions only.</li>
+    </ul>
+</article>
+</body>
+</html>

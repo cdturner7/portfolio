@@ -32,6 +32,10 @@
     var searchInput = document.getElementById("tb-search-input");
     var stLang = document.getElementById("st-lang");
     var stFile = document.getElementById("st-file");
+    var seOverlay = document.getElementById("se-overlay");
+    var seInput = document.getElementById("se-input");
+    var seResults = document.getElementById("se-results");
+    var seScope = document.getElementById("se-scope");
 
     // -- state --------------------------------------------------------------
     var fileIndex = {};                 // path -> {path,name,lang,icon}
@@ -41,6 +45,14 @@
     function readJSON(key, fallback) {
         try { return JSON.parse(localStorage.getItem(key)) || fallback; }
         catch (e) { return fallback; }
+    }
+    function isTyping(el) {
+        return !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+    }
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+        });
     }
     function save() {
         try {
@@ -341,16 +353,18 @@
     });
 
     // ------------------------------------------------------------- toolbar
-    document.getElementById("tb-run").addEventListener("click", function () { openFile(DEFAULT_FILE); });
-    document.getElementById("tb-menu").addEventListener("click", function () {
-        setProjectOpen(document.body.classList.contains("project-collapsed"));
-    });
-    document.getElementById("tb-settings").addEventListener("click", function () {
+    function resetLayout() {
         [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel].forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
         });
         window.location.href = window.location.pathname;
+    }
+
+    document.getElementById("tb-run").addEventListener("click", function () { openFile(DEFAULT_FILE); });
+    document.getElementById("tb-menu").addEventListener("click", function () {
+        setProjectOpen(document.body.classList.contains("project-collapsed"));
     });
+    document.getElementById("tb-settings").addEventListener("click", resetLayout);
 
     // welcome quick links
     welcome.addEventListener("click", function (e) {
@@ -389,9 +403,174 @@
         }
     });
 
+    // -------------------------------------------------- search everywhere
+    var seItems = [];
+    var seActive = 0;
+    var seActionsOnly = false;
+    var lastShiftAt = 0;
+
+    function seActionList() {
+        var acts = [
+            { label: "Toggle Project panel", key: "Alt+1", run: function () {
+                setProjectOpen(document.body.classList.contains("project-collapsed"));
+            } },
+            { label: "Open README.md", key: "", run: function () { openFile(DEFAULT_FILE); } },
+            { label: "Reset layout", key: "", run: resetLayout }
+        ];
+        if (state.active) {
+            acts.push({ label: "Close active tab", key: "Alt+W", run: function () { closeTab(state.active); } });
+            acts.push({ label: "Close all tabs", key: "", run: function () {
+                state.tabs.slice().forEach(function (t) { closeTab(t.path); });
+            } });
+        }
+        return acts;
+    }
+
+    // subsequence match; returns a score and the matched indices, or null
+    function fuzzy(query, text) {
+        var q = query.toLowerCase(), t = text.toLowerCase();
+        var qi = 0, streak = 0, score = 0, hits = [];
+        for (var i = 0; i < t.length && qi < q.length; i++) {
+            if (t.charAt(i) === q.charAt(qi)) {
+                hits.push(i);
+                streak++;
+                score += 1 + streak;                                  // reward runs
+                if (i === 0 || /[\/._\- ]/.test(t.charAt(i - 1))) score += 4;   // word start
+                qi++;
+            } else {
+                streak = 0;
+            }
+        }
+        if (qi < q.length) return null;
+        return { score: score - (t.length - q.length) * 0.05, hits: hits };  // prefer shorter
+    }
+
+    function highlight(text, hits) {
+        if (!hits || !hits.length) return escapeHtml(text);
+        var out = "", h = 0;
+        for (var i = 0; i < text.length; i++) {
+            var ch = escapeHtml(text.charAt(i));
+            if (h < hits.length && hits[h] === i) { out += "<b>" + ch + "</b>"; h++; }
+            else out += ch;
+        }
+        return out;
+    }
+
+    function seRender(query) {
+        var pool = [];
+        if (!seActionsOnly) {
+            Object.keys(fileIndex).forEach(function (p) {
+                var m = fileIndex[p];
+                pool.push({ icon: m.icon, label: m.name, sub: p, run: function () { openFile(p); } });
+            });
+        }
+        seActionList().forEach(function (a) {
+            pool.push({ icon: "action", label: a.label, sub: a.key, run: a.run });
+        });
+
+        var q = query.trim(), rows;
+        if (!q) {
+            rows = pool.slice(0, 40).map(function (e) { return { e: e, hits: [] }; });
+        } else {
+            rows = [];
+            pool.forEach(function (e) {
+                var byLabel = fuzzy(q, e.label);
+                var bySub = e.sub ? fuzzy(q, e.sub) : null;
+                if (!byLabel && !bySub) return;
+                var useLabel = byLabel && (!bySub || byLabel.score >= bySub.score);
+                rows.push({ e: e, hits: useLabel ? byLabel.hits : [], score: useLabel ? byLabel.score : bySub.score });
+            });
+            rows.sort(function (x, y) { return y.score - x.score; });
+            rows = rows.slice(0, 20);
+        }
+
+        seItems = rows.map(function (r) { return r.e; });
+        seActive = 0;
+        if (!rows.length) {
+            seResults.innerHTML = '<li class="se-empty">Nothing matches &ldquo;' + escapeHtml(q) + '&rdquo;</li>';
+            return;
+        }
+        seResults.innerHTML = rows.map(function (r, i) {
+            return '<li class="se-row' + (i === 0 ? " active" : "") + '" data-i="' + i + '">'
+                + '<span class="tree-icon icon-' + (r.e.icon || "txt") + '"></span>'
+                + '<span class="se-name">' + highlight(r.e.label, r.hits) + '</span>'
+                + (r.e.sub ? '<span class="se-sub">' + escapeHtml(r.e.sub) + '</span>' : '')
+                + '</li>';
+        }).join("");
+    }
+
+    function seOpen(actionsOnly) {
+        seActionsOnly = !!actionsOnly;
+        seScope.textContent = seActionsOnly ? "Actions" : "All";
+        seInput.placeholder = seActionsOnly ? "Find an action…" : "Search Everywhere…";
+        seInput.value = "";
+        seOverlay.hidden = false;
+        seRender("");
+        seInput.focus();
+    }
+    function seClose() {
+        seOverlay.hidden = true;
+        seInput.value = "";
+    }
+    function seMove(delta) {
+        var rows = seResults.querySelectorAll(".se-row");
+        if (!rows.length) return;
+        rows[seActive].classList.remove("active");
+        seActive = (seActive + delta + rows.length) % rows.length;
+        rows[seActive].classList.add("active");
+        rows[seActive].scrollIntoView({ block: "nearest" });
+    }
+    function seExec() {
+        var item = seItems[seActive];
+        seClose();
+        if (item) item.run();
+    }
+
+    seInput.addEventListener("input", function () { seRender(this.value); });
+    seInput.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowDown") { e.preventDefault(); seMove(1); }
+        else if (e.key === "ArrowUp") { e.preventDefault(); seMove(-1); }
+        else if (e.key === "Enter") { e.preventDefault(); seExec(); }
+        else if (e.key === "Escape") { e.preventDefault(); seClose(); }
+    });
+    seResults.addEventListener("mousemove", function (e) {
+        var row = e.target.closest(".se-row");
+        if (!row || +row.dataset.i === seActive) return;
+        var rows = seResults.querySelectorAll(".se-row");
+        if (rows[seActive]) rows[seActive].classList.remove("active");
+        seActive = +row.dataset.i;
+        row.classList.add("active");
+    });
+    seResults.addEventListener("click", function (e) {
+        var row = e.target.closest(".se-row");
+        if (!row) return;
+        seActive = +row.dataset.i;
+        seExec();
+    });
+    seOverlay.addEventListener("mousedown", function (e) {
+        if (e.target === seOverlay) seClose();
+    });
+
     // ------------------------------------------------------------ keyboard
     document.addEventListener("keydown", function (e) {
         var mod = e.ctrlKey || e.metaKey;
+
+        if (!seOverlay.hidden) return;                 // modal owns its keys while open
+
+        // Search Everywhere: Shift pressed twice, or Ctrl/Cmd+Shift+A for actions only
+        if (e.key === "Shift" && !e.repeat && !mod && !e.altKey && !isTyping(e.target)) {
+            var now = Date.now();
+            if (now - lastShiftAt < 400) { lastShiftAt = 0; seOpen(false); }
+            else lastShiftAt = now;
+            return;
+        }
+        lastShiftAt = 0;
+        if (mod && e.shiftKey && e.key.toLowerCase() === "a") {
+            e.preventDefault();
+            seOpen(true);
+            return;
+        }
+
         // Alt+W, not Ctrl+W: browsers close their own tab on Ctrl+W regardless of preventDefault
         if (e.altKey && e.key.toLowerCase() === "w" && state.active) {
             e.preventDefault();
