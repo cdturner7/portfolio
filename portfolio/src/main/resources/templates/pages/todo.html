@@ -10,15 +10,13 @@ rule: when asked to "do the next thing", take the top unchecked item under "Next
 
     <h1>TODO</h1>
     <p>
-        Working backlog for this project. Items are roughly ordered by impact. When an item ships,
-        check it off here and move it under <strong>Done</strong> with a one-line note.
+        Working backlog for this project, roughly ordered by impact. When an item ships it is
+        <strong>deleted from this file</strong> and added to the <strong>Features</strong> list in
+        <code>Projects/portfolio-site.md</code>.
     </p>
 
     <h2>Next up</h2>
     <ul class="todo">
-        <li><code>[x]</code> <strong>Search Everywhere (Double&#8209;Shift)</strong> &mdash; centered modal that
-            fuzzy&#8209;searches files <em>and</em> actions; <code>Ctrl/Cmd+Shift+A</code> opens it in
-            actions&#8209;only mode. Arrow keys + Enter to run, Esc to dismiss.</li>
         <li><code>[ ]</code> <strong>Structure tool window</strong> &mdash; enable the disabled Structure
             button; outline the active file from its <code>h2</code>/<code>h3</code> headings and scroll to
             them on click.</li>
@@ -77,25 +75,7 @@ rule: when asked to "do the next thing", take the top unchecked item under "Next
             visible focus rings, <code>prefers-reduced-motion</code>.</li>
     </ul>
 
-    <h2>Done</h2>
-    <ul class="todo">
-        <li><code>[x]</code> <strong>Search Everywhere (Double&#8209;Shift)</strong> &mdash; shipped
-            2026&#8209;09&#8209;01. Modal in <code>ide.html</code>, styles in <code>ide.css</code>, behaviour
-            in <code>ide.js</code> (<code>seOpen</code> / <code>seRender</code> / fuzzy matcher). Double&#8209;Shift
-            for all, <code>Ctrl/Cmd+Shift+A</code> for actions only.</li>
-        <li><code>[x]</code> <strong>Syntax highlighting in editor panes</strong> &mdash; shipped
-            2026&#8209;09&#8209;01. Small hand&#8209;rolled tokeniser (<code>HL</code> / <code>highlightCode</code>
-            in <code>ide.js</code>) run on <code>pre code[class*=language-]</code> after each pane loads;
-            <code>hl-*</code> classes mapped to <code>--syn-*</code> in <code>ide.css</code>. <code>Skills.json</code>
-            is now raw JSON coloured at runtime; <code>java</code> / <code>bash</code> supported for later use.</li>
-        <li><code>[x]</code> <strong>Terminal tool window</strong> &mdash; shipped 2026&#8209;09&#8209;01.
-            Bottom panel (<code>.ide-bottom</code>) toggled by the Terminal stripe button or <code>Alt+F12</code>,
-            drag&#8209;resizable, open state + height in <code>localStorage</code>. Commands in <code>ide.js</code>
-            (<code>TERM_CMDS</code>): <code>help</code>, <code>whoami</code>, <code>ls</code>, <code>cat</code>,
-            <code>open</code>, <code>git log</code>, <code>resume</code>, <code>echo</code>, <code>date</code>,
-            <code>pwd</code>, <code>clear</code>. History via &uarr;/&darr;. <code>git log</code> reads a
-            hand&#8209;maintained <code>GIT_LOG</code> snapshot.</li>
-    </ul>
+    <blockquote>Shipped items live in <code>Projects/portfolio-site.md</code> under <strong>Features</strong>.</blockquote>
 </article>
 </body>
 </html>
