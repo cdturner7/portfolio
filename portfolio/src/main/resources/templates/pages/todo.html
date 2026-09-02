@@ -19,8 +19,6 @@ rule: when asked to "do the next thing", take the top unchecked item under "Next
         <li><code>[x]</code> <strong>Search Everywhere (Double&#8209;Shift)</strong> &mdash; centered modal that
             fuzzy&#8209;searches files <em>and</em> actions; <code>Ctrl/Cmd+Shift+A</code> opens it in
             actions&#8209;only mode. Arrow keys + Enter to run, Esc to dismiss.</li>
-        <li><code>[ ]</code> <strong>Syntax highlighting in editor panes</strong> &mdash; real token colours for
-            code content, starting with <code>Skills.json</code>. Reuse the <code>--syn-*</code> variables.</li>
         <li><code>[ ]</code> <strong>Terminal tool window</strong> &mdash; enable the disabled Terminal button;
             a fake shell that types back: <code>help</code>, <code>whoami</code>, <code>ls</code>,
             <code>cat</code>, <code>open &lt;file&gt;</code>, <code>git log</code>, <code>resume</code>,
@@ -89,6 +87,11 @@ rule: when asked to "do the next thing", take the top unchecked item under "Next
             2026&#8209;09&#8209;01. Modal in <code>ide.html</code>, styles in <code>ide.css</code>, behaviour
             in <code>ide.js</code> (<code>seOpen</code> / <code>seRender</code> / fuzzy matcher). Double&#8209;Shift
             for all, <code>Ctrl/Cmd+Shift+A</code> for actions only.</li>
+        <li><code>[x]</code> <strong>Syntax highlighting in editor panes</strong> &mdash; shipped
+            2026&#8209;09&#8209;01. Small hand&#8209;rolled tokeniser (<code>HL</code> / <code>highlightCode</code>
+            in <code>ide.js</code>) run on <code>pre code[class*=language-]</code> after each pane loads;
+            <code>hl-*</code> classes mapped to <code>--syn-*</code> in <code>ide.css</code>. <code>Skills.json</code>
+            is now raw JSON coloured at runtime; <code>java</code> / <code>bash</code> supported for later use.</li>
     </ul>
 </article>
 </body>

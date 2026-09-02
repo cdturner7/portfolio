@@ -54,6 +54,73 @@
             return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
         });
     }
+
+    // ----------------------------------------------------- syntax highlighting
+    // A deliberately small tokeniser: enough to colour the JSON/code "files"
+    // without pulling in a highlighting library. Emits <span class="hl-*">.
+    var HL = {
+        esc: function (s) {
+            return s.replace(/[&<>]/g, function (c) {
+                return c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;";
+            });
+        },
+        // walk every match of `re`, passing the gaps between matches through `gap`
+        run: function (src, re, onMatch, gap) {
+            gap = gap || HL.esc;
+            var out = "", last = 0, m;
+            while ((m = re.exec(src))) {
+                if (m.index > last) out += gap(src.slice(last, m.index));
+                out += onMatch(m);
+                last = re.lastIndex;
+                if (m[0] === "") re.lastIndex++;          // guard against zero-width
+            }
+            return out + gap(src.slice(last));
+        },
+        json: function (src) {
+            var re = /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|([{}\[\],:])/g;
+            return HL.run(src, re, function (m) {
+                if (m[1] != null) {
+                    return m[2] != null
+                        ? '<span class="hl-key">' + HL.esc(m[1]) + '</span><span class="hl-punct">' + HL.esc(m[2]) + '</span>'
+                        : '<span class="hl-str">' + HL.esc(m[1]) + '</span>';
+                }
+                if (m[3] != null) return '<span class="hl-lit">' + m[3] + '</span>';
+                if (m[4] != null) return '<span class="hl-num">' + m[4] + '</span>';
+                return '<span class="hl-punct">' + HL.esc(m[5]) + '</span>';
+            });
+        },
+        generic: function (src, words) {
+            var re = /(\/\/[^\n]*|#[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|\b(0x[\da-fA-F]+|\d+(?:\.\d+)?)\b/g;
+            var kw = new RegExp("\\b(?:" + words + ")\\b", "g");
+            return HL.run(src, re, function (m) {
+                if (m[1] != null) return '<span class="hl-com">' + HL.esc(m[1]) + '</span>';
+                if (m[2] != null) return '<span class="hl-str">' + HL.esc(m[2]) + '</span>';
+                return '<span class="hl-num">' + m[3] + '</span>';
+            }, function (plain) {
+                return HL.esc(plain).replace(kw, '<span class="hl-kw">$&</span>');
+            });
+        }
+    };
+    var HL_WORDS = {
+        java: "abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|if|implements|import|instanceof|int|interface|long|new|package|private|protected|public|return|short|static|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|var|record|sealed|yield|true|false|null",
+        bash: "cd|ls|cat|echo|export|grep|sudo|rm|mkdir|git|curl|npm|mvn|java|sh|source|if|then|fi|for|do|done|while|case|esac|function|return|exit|set|pwd|which|chmod"
+    };
+
+    function highlightCode(root) {
+        var blocks = root.querySelectorAll('pre code[class*="language-"]');
+        for (var i = 0; i < blocks.length; i++) {
+            var el = blocks[i];
+            if (el.dataset.hl) continue;
+            var lang = (el.className.match(/language-([\w-]+)/) || [])[1];
+            var src = el.textContent, html;
+            if (lang === "json") html = HL.json(src);
+            else if (lang === "java") html = HL.generic(src, HL_WORDS.java);
+            else if (lang === "bash" || lang === "sh" || lang === "shell") html = HL.generic(src, HL_WORDS.bash);
+            else continue;
+            el.innerHTML = html;
+            el.dataset.hl = "1";
+        }
+    }
     function save() {
         try {
             localStorage.setItem(LS.tabs, JSON.stringify(state.tabs.map(function (t) { return t.path; })));
@@ -255,6 +322,7 @@
                 .then(function (html) {
                     contentLoaded[path] = true;
                     pane.innerHTML = html;
+                    highlightCode(pane);
                     if (state.active === path) updateGutter();
                 })
                 .catch(function () {

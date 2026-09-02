@@ -463,6 +463,15 @@ body.project-collapsed .ide-resizer { display: none; }
     margin: 12px 0;
 }
 .doc pre code { background: none; border: 0; padding: 0; }
+.doc kbd {
+    font-family: var(--mono-font);
+    font-size: 11px;
+    background: #2b2d30;
+    border: 1px solid var(--ide-border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 1px 5px;
+}
 .doc blockquote {
     border-left: 3px solid var(--ide-border);
     padding-left: 14px;
@@ -505,12 +514,17 @@ body.project-collapsed .ide-resizer { display: none; }
 
 /* json "file" */
 .doc-json pre { background: var(--ide-bg-editor); border: 0; padding: 0; font-size: 13px; line-height: 21px; }
-.doc-json .k { color: var(--syn-key); }
-.doc-json .s { color: var(--syn-string); }
-.doc-json .n { color: var(--syn-number); }
-.doc-json .b { color: var(--syn-keyword); }
-.doc-json .p { color: var(--syn-punct); }
-.doc-json .c { color: var(--syn-comment); }
+
+/* generated syntax highlighting - see highlightCode() in ide.js */
+.doc .hl-key   { color: var(--syn-key); }
+.doc .hl-str   { color: var(--syn-string); }
+.doc .hl-num   { color: var(--syn-number); }
+.doc .hl-lit,
+.doc .hl-kw    { color: var(--syn-keyword); }
+.doc .hl-punct { color: var(--syn-punct); }
+.doc .hl-com   { color: var(--syn-comment); font-style: italic; }
+.doc .hl-fn    { color: var(--syn-func); }
+.doc .hl-tag   { color: var(--syn-tag); }
 
 .doc .headshot {
     float: right;
