@@ -39,7 +39,7 @@
             <input id="tb-search-input" type="text" placeholder="Search files&hellip;" autocomplete="off" spellcheck="false"/>
         </label>
         <button class="tb-btn tb-run" id="tb-run" title="Open README.md" aria-label="Open README">&#9654;</button>
-        <button class="tb-btn" id="tb-settings" title="Reset layout" aria-label="Reset layout">&#9881;</button>
+        <button class="tb-btn" id="tb-settings" title="Settings (Ctrl+Alt+S)" aria-label="Settings">&#9881;</button>
     </header>
 
     <!-- ===== body ===== -->
@@ -138,6 +138,52 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== settings dialog (Ctrl+Alt+S) ===== -->
+    <div class="cfg-overlay" id="cfg-overlay" hidden>
+        <div class="cfg-modal" role="dialog" aria-modal="true" aria-label="Settings">
+            <div class="cfg-header">Settings</div>
+            <div class="cfg-body" id="cfg-body">
+                <div class="cfg-row">
+                    <label for="cfg-theme">Theme</label>
+                    <select id="cfg-theme">
+                        <option value="darcula">Darcula</option>
+                        <option value="light">IntelliJ Light</option>
+                        <option value="contrast">High contrast</option>
+                    </select>
+                </div>
+                <div class="cfg-row">
+                    <span>Editor font size</span>
+                    <span class="cfg-stepper">
+                        <button type="button" data-step="-1" aria-label="Smaller">&minus;</button>
+                        <span id="cfg-fontsize-val">13</span>
+                        <button type="button" data-step="1" aria-label="Larger">+</button>
+                    </span>
+                </div>
+                <div class="cfg-row">
+                    <label for="cfg-lineheight">Line height</label>
+                    <select id="cfg-lineheight">
+                        <option value="1.4">Compact</option>
+                        <option value="1.55">Default</option>
+                        <option value="1.8">Relaxed</option>
+                    </select>
+                </div>
+                <div class="cfg-row">
+                    <label for="cfg-presentation">Presentation mode</label>
+                    <input type="checkbox" id="cfg-presentation"/>
+                </div>
+                <div class="cfg-row">
+                    <span>Layout &amp; stored state</span>
+                    <button type="button" id="cfg-reset" class="cfg-danger">Reset layout</button>
+                </div>
+            </div>
+            <div class="cfg-footer">
+                <button type="button" id="cfg-close" class="cfg-done">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="pres-exit" id="pres-exit" type="button"><kbd>Esc</kbd> exit presentation</button>
 
     <!-- ===== status bar ===== -->
     <footer class="ide-status">

@@ -11,7 +11,6 @@
     "use strict";
 
     var DEFAULT_FILE = "README.md";
-    var LINE_HEIGHT = 21;
 
     var LS = {
         tabs: "ide.openTabs",
@@ -21,8 +20,16 @@
         panel: "ide.projectOpen",
         leftView: "ide.leftView",
         term: "ide.termOpen",
-        termH: "ide.termHeight"
+        termH: "ide.termHeight",
+        theme: "ide.theme",
+        fontSize: "ide.fontSize",
+        lineHeight: "ide.lineHeight",
+        presentation: "ide.presentation"
     };
+
+    // editor look, adjustable in the Settings dialog
+    var cfg = { theme: "darcula", fontSize: 13, lineHeight: 1.55, presentation: false };
+    function lineHeightPx() { return cfg.fontSize * cfg.lineHeight; }
 
     // -- dom ------------------------------------------------------------------
     var treeEl = document.getElementById("project-tree");
@@ -383,7 +390,7 @@
     // -------------------------------------------------------------- gutter
     function updateGutter() {
         var h = paneHost.scrollHeight;
-        var count = Math.max(Math.ceil(h / LINE_HEIGHT), 40);
+        var count = Math.max(Math.ceil(h / lineHeightPx()), 40);
         var buf = "";
         for (var n = 1; n <= count; n++) buf += "<span>" + n + "</span>";
         gutter.innerHTML = buf;
@@ -507,7 +514,8 @@
 
     // ------------------------------------------------------------- toolbar
     function resetLayout() {
-        [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.leftView, LS.term, LS.termH].forEach(function (k) {
+        [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.leftView, LS.term, LS.termH,
+         LS.theme, LS.fontSize, LS.lineHeight, LS.presentation].forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
         });
         window.location.href = window.location.pathname;
@@ -517,7 +525,7 @@
     document.getElementById("tb-menu").addEventListener("click", function () {
         setProjectOpen(document.body.classList.contains("project-collapsed"));
     });
-    document.getElementById("tb-settings").addEventListener("click", resetLayout);
+    document.getElementById("tb-settings").addEventListener("click", cfgOpen);
 
     // welcome quick links
     welcome.addEventListener("click", function (e) {
@@ -916,11 +924,95 @@
         try { localStorage.setItem(LS.termH, h); } catch (err) {}
     });
 
+    // ----------------------------------------------------------- settings
+    var cfgOverlay = document.getElementById("cfg-overlay");
+    var cfgTheme = document.getElementById("cfg-theme");
+    var cfgFontVal = document.getElementById("cfg-fontsize-val");
+    var cfgLineH = document.getElementById("cfg-lineheight");
+    var cfgPres = document.getElementById("cfg-presentation");
+
+    function loadCfg() {
+        try {
+            var t = localStorage.getItem(LS.theme);
+            if (t === "light" || t === "contrast" || t === "darcula") cfg.theme = t;
+            var f = parseFloat(localStorage.getItem(LS.fontSize));
+            if (f >= 11 && f <= 20) cfg.fontSize = f;
+            var l = parseFloat(localStorage.getItem(LS.lineHeight));
+            if (l >= 1.2 && l <= 2.2) cfg.lineHeight = l;
+            cfg.presentation = localStorage.getItem(LS.presentation) === "1";
+        } catch (e) {}
+    }
+    function saveCfg() {
+        try {
+            localStorage.setItem(LS.theme, cfg.theme);
+            localStorage.setItem(LS.fontSize, String(cfg.fontSize));
+            localStorage.setItem(LS.lineHeight, String(cfg.lineHeight));
+            localStorage.setItem(LS.presentation, cfg.presentation ? "1" : "0");
+        } catch (e) {}
+    }
+    function syncCfgControls() {
+        cfgTheme.value = cfg.theme;
+        cfgFontVal.textContent = cfg.fontSize;
+        cfgLineH.value = String(cfg.lineHeight);
+        cfgPres.checked = cfg.presentation;
+    }
+    function applyCfg() {
+        var root = document.documentElement;
+        if (cfg.theme === "darcula") root.removeAttribute("data-theme");
+        else root.setAttribute("data-theme", cfg.theme);
+        root.style.setProperty("--editor-font", cfg.fontSize + "px");
+        root.style.setProperty("--editor-lh", String(cfg.lineHeight));
+        document.body.classList.toggle("presentation", cfg.presentation);
+        if (state.active) updateGutter();
+        syncCfgControls();
+    }
+
+    function cfgOpen() { syncCfgControls(); cfgOverlay.hidden = false; }
+    function cfgClose() { cfgOverlay.hidden = true; }
+
+    cfgTheme.addEventListener("change", function () { cfg.theme = this.value; saveCfg(); applyCfg(); });
+    cfgLineH.addEventListener("change", function () { cfg.lineHeight = parseFloat(this.value); saveCfg(); applyCfg(); });
+    cfgPres.addEventListener("change", function () { cfg.presentation = this.checked; saveCfg(); applyCfg(); });
+    document.getElementById("cfg-body").addEventListener("click", function (e) {
+        var b = e.target.closest("[data-step]");
+        if (!b) return;
+        cfg.fontSize = Math.min(20, Math.max(11, cfg.fontSize + parseInt(b.dataset.step, 10)));
+        saveCfg();
+        applyCfg();
+    });
+    document.getElementById("cfg-reset").addEventListener("click", resetLayout);
+    document.getElementById("cfg-close").addEventListener("click", cfgClose);
+    cfgOverlay.addEventListener("mousedown", function (e) { if (e.target === cfgOverlay) cfgClose(); });
+    cfgOverlay.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.preventDefault(); cfgClose(); } });
+
+    document.getElementById("pres-exit").addEventListener("click", function () {
+        cfg.presentation = false;
+        saveCfg();
+        applyCfg();
+    });
+
     // ------------------------------------------------------------ keyboard
     document.addEventListener("keydown", function (e) {
         var mod = e.ctrlKey || e.metaKey;
 
+        if (e.defaultPrevented) return;                // already handled (e.g. a modal)
+        if (!cfgOverlay.hidden) return;                // settings dialog owns its keys
         if (!seOverlay.hidden) return;                 // modal owns its keys while open
+
+        // Ctrl/Cmd+Alt+S opens Settings
+        if (mod && e.altKey && e.key.toLowerCase() === "s") {
+            e.preventDefault();
+            cfgOpen();
+            return;
+        }
+        // Esc leaves presentation mode
+        if (e.key === "Escape" && cfg.presentation) {
+            e.preventDefault();
+            cfg.presentation = false;
+            saveCfg();
+            applyCfg();
+            return;
+        }
 
         // Search Everywhere: Shift pressed twice, or Ctrl/Cmd+Shift+A for actions only
         if (e.key === "Shift" && !e.repeat && !mod && !e.altKey && !isTyping(e.target)) {
@@ -962,6 +1054,9 @@
     function init() {
         indexTree();
         restoreCollapsed();
+
+        loadCfg();
+        applyCfg();
 
         var storedWidth = null;
         try { storedWidth = localStorage.getItem(LS.width); } catch (e) {}
