@@ -1244,6 +1244,63 @@ body.project-collapsed .ide-resizer { display: none; }
 }
 .gtl-box input:focus { outline: 0; border-color: var(--ide-accent); }
 
+/* ============================================================ notification balloons */
+.toast-stack {
+    position: fixed;
+    right: 16px;
+    bottom: calc(var(--status-h) + 14px);
+    z-index: 58;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(340px, 90vw);
+    pointer-events: none;
+}
+.toast {
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: 16px 1fr 18px;
+    gap: 2px 10px;
+    padding: 11px 12px;
+    background: var(--ide-bg-panel);
+    border: 1px solid var(--ide-border);
+    border-left: 3px solid var(--ide-accent);
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .4);
+    animation: toast-in .22s ease-out;
+}
+.toast.leaving { animation: toast-out .18s ease-in forwards; }
+.toast.type-success { border-left-color: var(--ide-run); }
+.toast-icon { grid-row: 1 / span 2; width: 16px; height: 16px; margin-top: 1px; color: var(--ide-accent); }
+.toast.type-success .toast-icon { color: var(--ide-run); }
+.toast-icon svg { width: 100%; height: 100%; fill: currentColor; display: block; }
+.toast-title { font-size: 12.5px; font-weight: 600; color: var(--ide-fg); }
+.toast-body {
+    font-size: 11.5px;
+    color: var(--ide-fg-dim);
+    font-family: var(--mono-font);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.toast-close {
+    grid-row: 1 / span 2;
+    align-self: start;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    color: var(--ide-fg-faint);
+    font-size: 14px;
+    line-height: 1;
+}
+.toast-close:hover { background: var(--ide-hover); color: var(--ide-fg); }
+
+@keyframes toast-in  { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+@keyframes toast-out { to { opacity: 0; transform: translateX(16px); } }
+@media (prefers-reduced-motion: reduce) {
+    .toast, .toast.leaving { animation: none; }
+}
+
 /* ---- presentation mode ---- */
 .pres-exit {
     display: none;
@@ -1272,7 +1329,8 @@ body.presentation .ide-toolbar,
 body.presentation .ide-stripe,
 body.presentation .ide-status,
 body.presentation .ide-project,
-body.presentation .ide-resizer { display: none; }
+body.presentation .ide-resizer,
+body.presentation .toast-stack { display: none; }
 body.presentation .pres-exit { display: flex; }
 
 @media (max-width: 720px) {

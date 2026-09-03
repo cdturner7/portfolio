@@ -77,6 +77,45 @@
         });
     }
 
+    // -------------------------------------------------- notification balloons
+    var toastStack = document.getElementById("toast-stack");
+    var TOAST_ICON = {
+        info: '<svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 3.2a1.05 1.05 0 1 1 0 2.1 1.05 1.05 0 0 1 0-2.1ZM9.2 12H6.9v-1h.8V7.9h-.8v-1H9v4.1h.7v1Z"/></svg>',
+        success: '<svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm3.4 4.8-4.1 4.1a.75.75 0 0 1-1.06 0L4.6 8.9A.75.75 0 1 1 5.66 7.8l1.1 1.1 3.58-3.57A.75.75 0 1 1 11.4 5.8Z"/></svg>'
+    };
+
+    // IntelliJ-style balloon in the bottom-right; auto-dismisses, hover to hold.
+    function toast(title, body, opts) {
+        opts = opts || {};
+        if (!toastStack || document.body.classList.contains("presentation")) return;
+        var type = opts.type === "success" ? "success" : "info";
+        var el = document.createElement("div");
+        el.className = "toast type-" + type;
+        el.setAttribute("role", "status");
+        el.innerHTML =
+            '<span class="toast-icon">' + TOAST_ICON[type] + "</span>" +
+            '<div class="toast-title">' + escapeHtml(title) + "</div>" +
+            (body ? '<div class="toast-body">' + escapeHtml(body) + "</div>" : "") +
+            '<button class="toast-close" type="button" aria-label="Dismiss">&times;</button>';
+
+        var timer;
+        function remove() { if (el.parentNode) el.parentNode.removeChild(el); }
+        function dismiss() {
+            clearTimeout(timer);
+            el.classList.add("leaving");
+            el.addEventListener("animationend", remove, { once: true });
+            setTimeout(remove, 300);                 // fallback when animations are off
+        }
+        el.querySelector(".toast-close").addEventListener("click", dismiss);
+        el.addEventListener("mouseenter", function () { clearTimeout(timer); });
+        el.addEventListener("mouseleave", function () { timer = setTimeout(dismiss, 1500); });
+
+        toastStack.appendChild(el);
+        while (toastStack.children.length > 4) toastStack.removeChild(toastStack.firstChild);
+        timer = setTimeout(dismiss, opts.ttl || 4200);
+        return el;
+    }
+
     // ----------------------------------------------------- syntax highlighting
     // A deliberately small tokeniser: enough to colour the JSON/code "files"
     // without pulling in a highlighting library. Emits <span class="hl-*">.
@@ -593,6 +632,10 @@
         try { document.execCommand("copy"); } catch (e) {}
         document.body.removeChild(ta);
     }
+    function copyAndToast(text) {
+        copyText(text);
+        toast("Copied to clipboard", text);
+    }
 
     function closeOtherTabs(keepPath) {
         state.tabs.slice().forEach(function (t) { if (t.path !== keepPath) closeTab(t.path); });
@@ -617,9 +660,9 @@
             ctxOpen(e.clientX, e.clientY, [
                 { label: "Open", run: function () { openFile(path); } },
                 { sep: true },
-                { label: "Copy Path", run: function () { copyText(path); } },
-                { label: "Copy Name", run: function () { copyText(name); } },
-                { label: "Copy Link", run: function () { copyText(fileLink(path)); } }
+                { label: "Copy Path", run: function () { copyAndToast(path); } },
+                { label: "Copy Name", run: function () { copyAndToast(name); } },
+                { label: "Copy Link", run: function () { copyAndToast(fileLink(path)); } }
             ]);
         } else if (li.classList.contains("tree-folder")) {
             var collapsed = li.classList.contains("collapsed");
@@ -630,7 +673,7 @@
                     persistCollapsed();
                 } },
                 { sep: true },
-                { label: "Copy Name", run: function () { copyText(fname); } }
+                { label: "Copy Name", run: function () { copyAndToast(fname); } }
             ]);
         }
     });
@@ -647,9 +690,9 @@
             { label: "Close Others", disabled: !multi, run: function () { closeOtherTabs(path); } },
             { label: "Close All", run: closeAllTabs },
             { sep: true },
-            { label: "Copy Path", run: function () { copyText(path); } },
-            { label: "Copy Name", run: function () { copyText(meta.name || path); } },
-            { label: "Copy Link", run: function () { copyText(fileLink(path)); } },
+            { label: "Copy Path", run: function () { copyAndToast(path); } },
+            { label: "Copy Name", run: function () { copyAndToast(meta.name || path); } },
+            { label: "Copy Link", run: function () { copyAndToast(fileLink(path)); } },
             { sep: true },
             { label: "Split Right", disabled: true }
         ]);
@@ -1546,6 +1589,19 @@
         if (target) openFile(target);
         else if (!state.tabs.length) openFile(DEFAULT_FILE);
         else { renderTabs(); showWelcome(); }
+
+        startupToasts();
+    }
+
+    // the "project opened" balloons IntelliJ shows while it wakes up
+    function startupToasts() {
+        var files = Object.keys(fileIndex).length;
+        setTimeout(function () {
+            toast("Indexing finished", files + " files indexed");
+        }, 750);
+        setTimeout(function () {
+            toast("Build succeeded", "in " + (1.6 + Math.random() * 1.8).toFixed(1) + "s", { type: "success" });
+        }, 1850);
     }
 
     init();
