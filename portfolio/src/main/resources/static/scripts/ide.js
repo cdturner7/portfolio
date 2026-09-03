@@ -53,6 +53,7 @@
     var seScope = document.getElementById("se-scope");
     var rfOverlay = document.getElementById("rf-overlay");
     var rfList = document.getElementById("rf-list");
+    var ctxMenu = document.getElementById("ctx-menu");
 
     var PROJECT_NAME = ((document.querySelector(".tb-project") || {}).textContent || "project").trim();
 
@@ -508,6 +509,151 @@
     });
     rfOverlay.addEventListener("mousedown", function (e) { if (e.target === rfOverlay) rfClose(); });
 
+    // -------------------------------------------------------- context menus
+    var ctxItems = [];
+    var ctxActive = -1;
+
+    function ctxClose() {
+        if (ctxMenu.hidden) return;
+        ctxMenu.hidden = true;
+        ctxMenu.innerHTML = "";
+        ctxItems = [];
+        ctxActive = -1;
+    }
+    function ctxOpen(x, y, items) {
+        ctxItems = items.filter(Boolean);
+        ctxMenu.innerHTML = ctxItems.map(function (it, i) {
+            if (it.sep) return '<div class="ctx-sep"></div>';
+            return '<div class="ctx-item' + (it.disabled ? " disabled" : "") + (it.danger ? " danger" : "")
+                + '" data-i="' + i + '"><span>' + escapeHtml(it.label) + "</span>"
+                + (it.hint ? '<span class="ctx-hint">' + escapeHtml(it.hint) + "</span>" : "")
+                + "</div>";
+        }).join("");
+        ctxMenu.hidden = false;
+        var vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+        ctxMenu.style.left = Math.max(4, Math.min(x, vw - ctxMenu.offsetWidth - 4)) + "px";
+        ctxMenu.style.top = Math.max(4, Math.min(y, vh - ctxMenu.offsetHeight - 4)) + "px";
+        ctxActive = -1;
+    }
+    function ctxRun(i) {
+        var it = ctxItems[i];
+        ctxClose();
+        if (it && !it.sep && !it.disabled && it.run) it.run();
+    }
+    function ctxMove(delta) {
+        var n = ctxItems.length;
+        if (!n) return;
+        var next = ctxActive;
+        for (var k = 0; k < n; k++) {
+            next = (next + delta + n) % n;
+            if (!ctxItems[next].sep && !ctxItems[next].disabled) break;
+        }
+        var rows = ctxMenu.querySelectorAll(".ctx-item");
+        for (var j = 0; j < rows.length; j++) rows[j].classList.remove("active");
+        ctxActive = next;
+        var el = ctxMenu.querySelector('.ctx-item[data-i="' + next + '"]');
+        if (el) el.classList.add("active");
+    }
+
+    ctxMenu.addEventListener("click", function (e) {
+        var row = e.target.closest(".ctx-item");
+        if (!row || row.classList.contains("disabled")) return;
+        ctxRun(+row.dataset.i);
+    });
+    ctxMenu.addEventListener("mousemove", function (e) {
+        var row = e.target.closest(".ctx-item");
+        if (!row) return;
+        var rows = ctxMenu.querySelectorAll(".ctx-item");
+        for (var j = 0; j < rows.length; j++) rows[j].classList.remove("active");
+        row.classList.add("active");
+        ctxActive = +row.dataset.i;
+    });
+    document.addEventListener("mousedown", function (e) {
+        if (!ctxMenu.hidden && !ctxMenu.contains(e.target)) ctxClose();
+    });
+    window.addEventListener("blur", ctxClose);
+    window.addEventListener("resize", ctxClose);
+    document.addEventListener("scroll", ctxClose, true);
+
+    function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+    function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta);
+    }
+
+    function closeOtherTabs(keepPath) {
+        state.tabs.slice().forEach(function (t) { if (t.path !== keepPath) closeTab(t.path); });
+    }
+    function closeAllTabs() {
+        state.tabs.slice().forEach(function (t) { closeTab(t.path); });
+    }
+    function fileLink(path) {
+        var u = new URL(window.location.href);
+        u.searchParams.set("file", path);
+        return u.toString();
+    }
+
+    treeEl.addEventListener("contextmenu", function (e) {
+        var row = e.target.closest(".tree-row");
+        if (!row) return;
+        e.preventDefault();
+        var li = row.parentElement;
+        if (li.classList.contains("tree-file")) {
+            var path = li.getAttribute("data-path");
+            var name = li.getAttribute("data-name");
+            ctxOpen(e.clientX, e.clientY, [
+                { label: "Open", run: function () { openFile(path); } },
+                { sep: true },
+                { label: "Copy Path", run: function () { copyText(path); } },
+                { label: "Copy Name", run: function () { copyText(name); } },
+                { label: "Copy Link", run: function () { copyText(fileLink(path)); } }
+            ]);
+        } else if (li.classList.contains("tree-folder")) {
+            var collapsed = li.classList.contains("collapsed");
+            var fname = row.getAttribute("data-folder");
+            ctxOpen(e.clientX, e.clientY, [
+                { label: collapsed ? "Expand" : "Collapse", run: function () {
+                    li.classList.toggle("collapsed");
+                    persistCollapsed();
+                } },
+                { sep: true },
+                { label: "Copy Name", run: function () { copyText(fname); } }
+            ]);
+        }
+    });
+
+    tabBar.addEventListener("contextmenu", function (e) {
+        var tab = e.target.closest(".tab");
+        if (!tab) return;
+        e.preventDefault();
+        var path = tab.dataset.path;
+        var meta = fileIndex[path] || {};
+        var multi = state.tabs.length > 1;
+        ctxOpen(e.clientX, e.clientY, [
+            { label: "Close", hint: path === state.active ? "Alt+W" : "", run: function () { closeTab(path); } },
+            { label: "Close Others", disabled: !multi, run: function () { closeOtherTabs(path); } },
+            { label: "Close All", run: closeAllTabs },
+            { sep: true },
+            { label: "Copy Path", run: function () { copyText(path); } },
+            { label: "Copy Name", run: function () { copyText(meta.name || path); } },
+            { label: "Copy Link", run: function () { copyText(fileLink(path)); } },
+            { sep: true },
+            { label: "Split Right", disabled: true }
+        ]);
+    });
+
     // -------------------------------------------------------------- gutter
     function updateGutter() {
         var h = paneHost.scrollHeight;
@@ -773,9 +919,7 @@
         if (state.active) {
             acts.push({ label: "Go to line…", key: "Ctrl+G", run: gtlOpen });
             acts.push({ label: "Close active tab", key: "Alt+W", run: function () { closeTab(state.active); } });
-            acts.push({ label: "Close all tabs", key: "", run: function () {
-                state.tabs.slice().forEach(function (t) { closeTab(t.path); });
-            } });
+            acts.push({ label: "Close all tabs", key: "", run: closeAllTabs });
         }
         return acts;
     }
@@ -1190,6 +1334,15 @@
         var mod = e.ctrlKey || e.metaKey;
 
         if (e.defaultPrevented) return;                // already handled (e.g. a modal)
+
+        // context menu, when open, captures the arrow keys
+        if (!ctxMenu.hidden) {
+            if (e.key === "Escape") { e.preventDefault(); ctxClose(); }
+            else if (e.key === "ArrowDown") { e.preventDefault(); ctxMove(1); }
+            else if (e.key === "ArrowUp") { e.preventDefault(); ctxMove(-1); }
+            else if (e.key === "Enter" && ctxActive >= 0) { e.preventDefault(); ctxRun(ctxActive); }
+            return;
+        }
 
         // Recent Files popup has no input of its own, so it is driven from here
         if (!rfOverlay.hidden) {
