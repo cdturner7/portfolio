@@ -1,23 +1,84 @@
-<!--/* Skills.json - raw JSON, syntax-highlighted client-side by highlightCode() in ide.js */-->
+<!--/* Skills.json - real JSON, rendered as a collapsible tree by renderJsonPane() in ide.js */-->
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<article class="doc doc-json" th:fragment="content"><pre><code class="language-json">{
-  "languages": ["Java", "Python", "JavaScript", "SQL", "HTML", "CSS", "C++"],
-  "frameworks": ["Spring Boot", "Spring MVC", "JUnit", "Selenium", "Bootstrap", "jQuery", "Log4j"],
-  "cloud": {
-    "provider": "AWS",
-    "focus": ["EC2", "deployment pipelines", "on-prem to cloud migrations"]
+<div class="jsonview" th:fragment="content">
+    <div class="jsonbar">
+        <span class="jsonbar-name">Skills.json</span>
+        <span class="jsonbar-hint">proficiency &middot; click a node to fold</span>
+        <span class="jsonbar-spacer"></span>
+        <button type="button" class="jsonbar-btn" data-jt="collapse">Collapse all</button>
+        <button type="button" class="jsonbar-btn" data-jt="expand">Expand all</button>
+    </div>
+    <div class="jsontree" id="jsontree"></div>
+    <script type="application/json" id="skills-json">
+{
+  "role": "Senior Software and Application Engineer",
+  "experience": { "years": 5, "since": 2020, "focus": "Java / Spring backends, AWS migrations, test automation" },
+  "levels": ["advanced", "proficient", "familiar"],
+  "categories": {
+    "languages": [
+      { "name": "Java", "level": "advanced" },
+      { "name": "SQL", "level": "advanced" },
+      { "name": "JavaScript", "level": "proficient" },
+      { "name": "Python", "level": "proficient" },
+      { "name": "HTML/CSS", "level": "proficient" },
+      { "name": "C++", "level": "familiar" }
+    ],
+    "frameworks": [
+      { "name": "Spring Boot", "level": "advanced" },
+      { "name": "Spring MVC", "level": "advanced" },
+      { "name": "JUnit", "level": "advanced" },
+      { "name": "Selenium", "level": "proficient" },
+      { "name": "jQuery", "level": "proficient" },
+      { "name": "Bootstrap", "level": "proficient" },
+      { "name": "Log4j", "level": "proficient" }
+    ],
+    "cloud": [
+      { "name": "AWS EC2", "level": "advanced" },
+      { "name": "Deployment pipelines", "level": "advanced" },
+      { "name": "On-prem to cloud migration", "level": "advanced" }
+    ],
+    "databases": [
+      { "name": "PostgreSQL", "level": "advanced" },
+      { "name": "Oracle", "level": "proficient" },
+      { "name": "DB2", "level": "proficient" },
+      { "name": "MySQL", "level": "proficient" }
+    ],
+    "tools": [
+      { "name": "Git", "level": "advanced" },
+      { "name": "Maven", "level": "advanced" },
+      { "name": "Jenkins", "level": "advanced" },
+      { "name": "Jira", "level": "proficient" },
+      { "name": "Nexus", "level": "proficient" },
+      { "name": "DBeaver", "level": "proficient" }
+    ],
+    "webServers": [
+      { "name": "Apache Tomcat", "level": "advanced" },
+      { "name": "IBM WebSphere", "level": "proficient" },
+      { "name": "RedHat JBoss", "level": "familiar" }
+    ],
+    "ides": [
+      { "name": "IntelliJ IDEA", "level": "advanced" },
+      { "name": "VS Code", "level": "proficient" },
+      { "name": "Eclipse", "level": "proficient" }
+    ],
+    "operatingSystems": [
+      { "name": "Linux", "level": "advanced" },
+      { "name": "Windows", "level": "advanced" },
+      { "name": "macOS", "level": "proficient" }
+    ],
+    "practices": [
+      { "name": "Agile / Scrum", "level": "advanced" },
+      { "name": "Regression testing", "level": "advanced" },
+      { "name": "Code review", "level": "advanced" },
+      { "name": "Mentoring and onboarding", "level": "advanced" }
+    ]
   },
-  "databases": ["Oracle", "PostgreSQL", "DB2", "MySQL"],
-  "tools": ["Git", "Jenkins", "Maven", "Nexus", "Jira", "DBeaver", "PuTTY", "FileZilla"],
-  "webServers": ["Apache Tomcat", "IBM WebSphere", "RedHat JBoss"],
-  "ides": ["IntelliJ IDEA", "VS Code", "Eclipse"],
-  "operatingSystems": ["Linux", "macOS", "Windows"],
-  "practices": ["Agile / Scrum", "regression testing", "mentoring", "cloud migration"],
-  "yearsExperience": 5,
+  "certifications": ["UVM Certificate in Cyber Security"],
   "openToWork": false
-}</code></pre>
-</article>
+}
+    </script>
+</div>
 </body>
 </html>

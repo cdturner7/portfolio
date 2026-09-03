@@ -389,8 +389,9 @@
                     pane.innerHTML = html;
                     highlightCode(pane);
                     enhancePdfPane(pane);
+                    renderJsonPane(pane);
                     if (state.active === path) {
-                        gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview"));
+                        gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview, .jsonview"));
                         updateGutter();
                         refreshStructureIfVisible();
                     }
@@ -399,7 +400,7 @@
                     pane.innerHTML = '<div class="doc-error">Could not load "' + path + '".</div>';
                 });
         } else {
-            gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview"));
+            gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview, .jsonview"));
             updateGutter();
         }
     }
@@ -416,11 +417,82 @@
         });
     }
 
+    // Skills.json pane: turn the embedded JSON into a collapsible tree
+    function jtPrim(v) {
+        if (v === null) return '<span class="jt-null">null</span>';
+        if (typeof v === "string") return '<span class="jt-str">"' + escapeHtml(v) + '"</span>';
+        if (typeof v === "number") return '<span class="jt-num">' + v + '</span>';
+        if (typeof v === "boolean") return '<span class="jt-bool">' + v + '</span>';
+        return escapeHtml(String(v));
+    }
+    function jtIsFlat(v) {
+        if (!v || typeof v !== "object" || Array.isArray(v)) return false;
+        var ks = Object.keys(v);
+        return ks.length <= 3 && ks.every(function (k) { return !v[k] || typeof v[k] !== "object"; });
+    }
+    function jtInline(obj) {
+        return '<span class="jt-brace">{ </span>' + Object.keys(obj).map(function (k) {
+            return '<span class="jt-key">"' + escapeHtml(k) + '"</span><span class="jt-colon">: </span>' + jtPrim(obj[k]);
+        }).join('<span class="jt-comma">, </span>') + '<span class="jt-brace"> }</span>';
+    }
+    function jtBuild(key, val, depth) {
+        var keyHtml = key === null ? ""
+            : '<span class="jt-key">"' + escapeHtml(key) + '"</span><span class="jt-colon">: </span>';
+
+        if (!val || typeof val !== "object") {
+            return '<div class="jt-row jt-leaf">' + keyHtml + jtPrim(val) + '</div>';
+        }
+        if (jtIsFlat(val)) {
+            return '<div class="jt-row jt-leaf">' + keyHtml + jtInline(val) + '</div>';
+        }
+        var isArr = Array.isArray(val);
+        var open = isArr ? "[" : "{";
+        var close = isArr ? "]" : "}";
+        var keys = isArr ? val.map(function (_, i) { return i; }) : Object.keys(val);
+        var kids = keys.map(function (k) { return jtBuild(isArr ? null : k, val[k], depth + 1); }).join("");
+
+        return '<div class="jt-node' + (depth === 0 ? " jt-root" : "") + (depth >= 2 ? " collapsed" : "") + '">'
+            + '<div class="jt-row jt-branch"><span class="jt-toggle"></span>' + keyHtml
+            + '<span class="jt-brace">' + open + '</span>'
+            + '<span class="jt-count">' + keys.length + '</span>'
+            + '<span class="jt-preview"> … ' + close + '</span></div>'
+            + '<div class="jt-children">' + kids + '</div>'
+            + '<div class="jt-row jt-close"><span class="jt-brace">' + close + '</span></div>'
+            + '</div>';
+    }
+    function renderJsonPane(pane) {
+        var host = pane.querySelector(".jsontree");
+        if (!host) return;
+        var raw = pane.querySelector('script[type="application/json"]');
+        var data;
+        try { data = JSON.parse(raw.textContent); }
+        catch (e) { host.innerHTML = '<div class="doc-error">Skills.json failed to parse.</div>'; return; }
+        host.innerHTML = jtBuild(null, data, 0);
+    }
+
     paneHost.addEventListener("click", function (e) {
-        if (!e.target.closest("[data-pdf-print]")) return;
-        var frame = paneHost.querySelector(".editor-doc:not([hidden]) .pdfframe");
-        try { (frame && frame.contentWindow ? frame.contentWindow : window).print(); }
-        catch (err) { window.print(); }
+        if (e.target.closest("[data-pdf-print]")) {
+            var frame = paneHost.querySelector(".editor-doc:not([hidden]) .pdfframe");
+            try { (frame && frame.contentWindow ? frame.contentWindow : window).print(); }
+            catch (err) { window.print(); }
+            return;
+        }
+        var jt = e.target.closest("[data-jt]");
+        if (jt) {
+            var tree = paneHost.querySelector(".editor-doc:not([hidden]) .jsontree");
+            if (!tree) return;
+            var collapse = jt.getAttribute("data-jt") === "collapse";
+            var nodes = tree.querySelectorAll(".jt-node");
+            for (var i = 0; i < nodes.length; i++) {
+                if (collapse && nodes[i].classList.contains("jt-root")) continue;
+                nodes[i].classList.toggle("collapsed", collapse);
+            }
+            return;
+        }
+        var branch = e.target.closest(".jt-branch");
+        if (branch && branch.parentElement.classList.contains("jt-node")) {
+            branch.parentElement.classList.toggle("collapsed");
+        }
     });
 
     function closeTab(path) {

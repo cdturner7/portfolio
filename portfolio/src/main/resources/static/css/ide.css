@@ -655,6 +655,67 @@ body.project-collapsed .ide-resizer { display: none; }
     box-shadow: 0 6px 28px rgba(0, 0, 0, .45);
 }
 
+/* ---- Skills.json: a collapsible JSON tree ---- */
+.jsonview {
+    margin-left: calc(-1 * var(--gutter-w));   /* the gutter is hidden for this pane */
+    display: flex;
+    flex-direction: column;
+    background: var(--ide-bg-editor);
+}
+.jsonbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    flex: none;
+    padding: 0 12px;
+    background: var(--ide-bg-panel);
+    border-bottom: 1px solid var(--ide-border-strong);
+    font-size: 12px;
+    color: var(--ide-fg-dim);
+}
+.jsonbar-name { font-family: var(--mono-font); }
+.jsonbar-hint { font-size: 11px; color: var(--ide-fg-faint); }
+.jsonbar-spacer { flex: 1; }
+.jsonbar-btn {
+    height: 22px;
+    padding: 0 10px;
+    border: 1px solid var(--ide-border);
+    border-radius: 5px;
+    color: var(--ide-fg);
+    font-size: 11.5px;
+}
+.jsonbar-btn:hover { background: var(--ide-hover); border-color: var(--ide-accent); }
+
+.jsontree {
+    padding: 12px 14px 48px;
+    font: 400 12.5px/1.7 var(--mono-font);
+    color: var(--syn-punct);
+    overflow-x: auto;
+}
+.jt-row { white-space: nowrap; }
+.jt-leaf, .jt-close { padding-left: 12px; }
+.jt-branch { cursor: pointer; border-radius: 3px; }
+.jt-branch:hover { background: var(--ide-hover); }
+.jt-children { margin-left: 3px; padding-left: 18px; border-left: 1px solid var(--ide-border); }
+.jt-toggle { display: inline-block; width: 12px; color: var(--ide-fg-dim); font-size: 9px; }
+.jt-toggle::before { content: "\25be"; }                          /* ▾ */
+.jt-node.collapsed > .jt-row .jt-toggle::before { content: "\25b8"; }  /* ▸ */
+.jt-node.collapsed > .jt-children,
+.jt-node.collapsed > .jt-close { display: none; }
+.jt-preview { display: none; color: var(--ide-fg-faint); }
+.jt-node.collapsed > .jt-row .jt-preview { display: inline; }
+
+.jt-key   { color: var(--syn-key); }
+.jt-count { margin-left: 6px; color: var(--ide-fg-faint); font-size: 11px; }
+.jt-str   { color: var(--syn-string); }
+.jt-num   { color: var(--syn-number); }
+.jt-bool,
+.jt-null  { color: var(--syn-keyword); }
+
 /* ============================================================ document styling */
 .doc {
     max-width: 860px;
