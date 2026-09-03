@@ -17,6 +17,29 @@
         <dd><a href="https://github.com/cdturner7" target="_blank" rel="noopener">github.com/cdturner7</a></dd>
     </dl>
 
+    <h2>Send a message</h2>
+    <p>There is no inbox on this server, so the form composes the email and hands it to your mail
+        client &mdash; or copy the text and send it however you like.</p>
+    <form class="cform" data-contact novalidate>
+        <div class="cform-row">
+            <label for="cf-name">Name</label>
+            <input id="cf-name" name="name" type="text" autocomplete="name" spellcheck="false"/>
+        </div>
+        <div class="cform-row">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" name="email" type="email" autocomplete="email" spellcheck="false"/>
+        </div>
+        <div class="cform-row">
+            <label for="cf-message">Message</label>
+            <textarea id="cf-message" name="message" rows="5" spellcheck="false"></textarea>
+        </div>
+        <div class="cform-actions">
+            <button type="submit" class="cform-send">Compose email</button>
+            <button type="button" class="cform-copy" data-contact-copy>Copy message</button>
+            <span class="cform-status" role="status" aria-live="polite"></span>
+        </div>
+    </form>
+
     <div class="links">
         <a href="mailto:collin.turn@gmail.com" aria-label="Email">
             <svg viewBox="0 0 16 16"><path d="M1.5 3h13A1.5 1.5 0 0 1 16 4.5v7A1.5 1.5 0 0 1 14.5 13h-13A1.5 1.5 0 0 1 0 11.5v-7A1.5 1.5 0 0 1 1.5 3Zm0 1.6v.2l6.5 4 6.5-4v-.2h-13Zm13 1.9-6.5 4-6.5-4v5h13v-5Z"/></svg>

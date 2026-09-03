@@ -493,6 +493,48 @@
         if (branch && branch.parentElement.classList.contains("jt-node")) {
             branch.parentElement.classList.toggle("collapsed");
         }
+
+        var cc = e.target.closest("[data-contact-copy]");
+        if (cc) {
+            var cf = cc.closest("form");
+            if (cf) { copyText(contactText(cf)); toast("Message copied", "Send it to collin.turn@gmail.com"); }
+        }
+    });
+
+    // Contact.md form: no mail backend, so compose a mailto and hand off
+    function contactFields(form) {
+        return {
+            name: (form.elements["name"].value || "").trim(),
+            email: (form.elements["email"].value || "").trim(),
+            message: (form.elements["message"].value || "").trim()
+        };
+    }
+    function contactText(form) {
+        var f = contactFields(form);
+        return "To: collin.turn@gmail.com\nFrom: " + f.name + " <" + f.email + ">\n\n" + f.message;
+    }
+    paneHost.addEventListener("submit", function (e) {
+        var form = e.target.closest("form[data-contact]");
+        if (!form) return;
+        e.preventDefault();
+        var f = contactFields(form);
+        var status = form.querySelector(".cform-status");
+        if (!f.name || !f.message || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)) {
+            status.textContent = "Add your name, a valid email, and a message.";
+            status.className = "cform-status err";
+            return;
+        }
+        var href = "mailto:collin.turn@gmail.com"
+            + "?subject=" + encodeURIComponent("Portfolio message from " + f.name)
+            + "&body=" + encodeURIComponent(f.message + "\n\n— " + f.name + " <" + f.email + ">");
+        var a = document.createElement("a");
+        a.href = href;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        status.textContent = "Opening your email client… no luck? Use “Copy message”.";
+        status.className = "cform-status ok";
     });
 
     function closeTab(path) {
