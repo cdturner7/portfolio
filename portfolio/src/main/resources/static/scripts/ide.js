@@ -957,6 +957,7 @@
             { label: "Toggle Structure panel", key: "Alt+7", run: function () { toggleLeft("structure"); } },
             { label: "Settings", key: "Ctrl+Alt+S", run: cfgOpen },
             { label: "Recent Files…", key: "Ctrl+E", run: rfOpen },
+            { label: "Keyboard shortcuts", key: "F1", run: ksOpen },
             { label: "Open README.md", key: "", run: function () { openFile(DEFAULT_FILE); } },
             { label: "Reset layout", key: "", run: resetLayout }
         ];
@@ -1443,6 +1444,69 @@
         applyCfg();
     });
 
+    // -------------------------------------------------- shortcuts cheat-sheet
+    var ksOverlay = document.getElementById("ks-overlay");
+    var ksBody = document.getElementById("ks-body");
+    var ksIsMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || "");
+    var KMOD = ksIsMac ? "⌘" : "Ctrl";
+    var KOPT = ksIsMac ? "⌥" : "Alt";
+
+    var KS_GROUPS = [
+        ["Search & navigation", [
+            [["Shift", "Shift"], "Search Everywhere"],
+            [[KMOD, "Shift", "A"], "Find action"],
+            [[KMOD, "E"], "Recent files"],
+            [[KMOD, "G"], "Go to line"]
+        ]],
+        ["Tool windows", [
+            [[KOPT, "1"], "Project"],
+            [[KOPT, "7"], "Structure"],
+            [[KOPT, "F12"], "Terminal / bottom window"],
+            [[KMOD, KOPT, "S"], "Settings"],
+            [["F1"], "This cheat-sheet"]
+        ]],
+        ["Editor tabs", [
+            [[KOPT, "W"], "Close tab"],
+            [[KMOD, "Shift", "←"], "Previous tab"],
+            [[KMOD, "Shift", "→"], "Next tab"],
+            [["drag"], "Reorder tab"],
+            [["middle-click"], "Close tab"]
+        ]],
+        ["Editor", [
+            [["click"], "Move the caret"],
+            [[KMOD, "G"], "Go to line"]
+        ]],
+        ["Terminal", [
+            [["↑", "↓"], "Command history"],
+            [[KMOD, "L"], "Clear"],
+            [["Esc"], "Hide the terminal"]
+        ]],
+        ["Popups & dialogs", [
+            [["↑", "↓"], "Move selection"],
+            [["Enter"], "Accept"],
+            [["Esc"], "Dismiss"]
+        ]]
+    ];
+
+    function ksRender() {
+        ksBody.innerHTML = KS_GROUPS.map(function (g) {
+            return '<section class="ks-group"><h4>' + escapeHtml(g[0]) + "</h4>"
+                + g[1].map(function (r) {
+                    return '<div class="ks-row"><span class="ks-desc">' + escapeHtml(r[1]) + "</span>"
+                        + '<span class="ks-keys">'
+                        + r[0].map(function (k) { return "<kbd>" + escapeHtml(k) + "</kbd>"; }).join("")
+                        + "</span></div>";
+                }).join("")
+                + "</section>";
+        }).join("");
+    }
+    function ksOpen() {
+        if (!ksBody.children.length) ksRender();
+        ksOverlay.hidden = false;
+    }
+    function ksClose() { ksOverlay.hidden = true; }
+    ksOverlay.addEventListener("mousedown", function (e) { if (e.target === ksOverlay) ksClose(); });
+
     // ------------------------------------------------------------ keyboard
     document.addEventListener("keydown", function (e) {
         var mod = e.ctrlKey || e.metaKey;
@@ -1467,6 +1531,12 @@
             return;
         }
 
+        // shortcuts cheat-sheet: any of Esc / F1 / ? closes it
+        if (!ksOverlay.hidden) {
+            if (e.key === "Escape" || e.key === "F1" || e.key === "?") { e.preventDefault(); ksClose(); }
+            return;
+        }
+
         if (!cfgOverlay.hidden) return;                // settings dialog owns its keys
         if (!gtlOverlay.hidden) return;                // go-to-line owns its keys
         if (!seOverlay.hidden) return;                 // modal owns its keys while open
@@ -1487,6 +1557,12 @@
         if (mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "e") {
             e.preventDefault();
             rfOpen();
+            return;
+        }
+        // F1 or ? opens the shortcuts cheat-sheet
+        if ((e.key === "F1" || e.key === "?") && !mod && !e.altKey && !isTyping(e.target)) {
+            e.preventDefault();
+            ksOpen();
             return;
         }
         // Esc leaves presentation mode
