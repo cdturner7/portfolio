@@ -24,7 +24,8 @@
         theme: "ide.theme",
         fontSize: "ide.fontSize",
         lineHeight: "ide.lineHeight",
-        presentation: "ide.presentation"
+        presentation: "ide.presentation",
+        recent: "ide.recentFiles"
     };
 
     // editor look, adjustable in the Settings dialog
@@ -34,6 +35,7 @@
     // -- dom ------------------------------------------------------------------
     var treeEl = document.getElementById("project-tree");
     var tabBar = document.getElementById("editor-tabs");
+    var crumbBar = document.getElementById("editor-crumbs");
     var paneHost = document.getElementById("editor-panes");
     var welcome = document.getElementById("welcome-screen");
     var gutter = document.getElementById("gutter");
@@ -49,11 +51,16 @@
     var seInput = document.getElementById("se-input");
     var seResults = document.getElementById("se-results");
     var seScope = document.getElementById("se-scope");
+    var rfOverlay = document.getElementById("rf-overlay");
+    var rfList = document.getElementById("rf-list");
+
+    var PROJECT_NAME = ((document.querySelector(".tb-project") || {}).textContent || "project").trim();
 
     // -- state --------------------------------------------------------------
     var fileIndex = {};                 // path -> {path,name,lang,icon}
     var state = { tabs: [], active: null };
     var contentLoaded = {};             // path -> true once fetched
+    var recent = [];                    // recently-opened paths, most-recent first
 
     function readJSON(key, fallback) {
         try { return JSON.parse(localStorage.getItem(key)) || fallback; }
@@ -296,10 +303,12 @@
 
     function setActive(path) {
         state.active = path;
+        pushRecent(path);
         renderTabs();
         renderTreeSelection();
         showPane(path);
         updateStatus(path);
+        renderCrumbs(path);
         resetCaret();
         refreshStructureIfVisible();
         save();
@@ -377,6 +386,7 @@
         renderTabs();
         renderTreeSelection();
         updateStatus(null);
+        renderCrumbs(null);
         resetCaret();
         refreshStructureIfVisible();
         save();
@@ -391,6 +401,112 @@
         stLang.textContent = meta ? meta.lang : "—";
         stFile.textContent = meta ? meta.name : "no file";
     }
+
+    // --------------------------------------------------------- breadcrumbs
+    function crumb(cls, folder, icon, text) {
+        return '<span class="crumb ' + cls + '"' + (folder ? ' data-folder="' + escapeHtml(folder) + '"' : "")
+            + '><span class="tree-icon icon-' + icon + '"></span>' + escapeHtml(text) + "</span>";
+    }
+    function renderCrumbs(path) {
+        var meta = path ? fileIndex[path] : null;
+        if (!meta) { crumbBar.hidden = true; crumbBar.innerHTML = ""; return; }
+        var parts = path.split("/");
+        var html = crumb("crumb-root", "__root__", "module", PROJECT_NAME);
+        for (var i = 0; i < parts.length; i++) {
+            html += '<span class="crumb-sep">›</span>';
+            html += i === parts.length - 1
+                ? crumb("crumb-file", null, meta.icon || "txt", meta.name)
+                : crumb("crumb-folder", parts[i], "folder", parts[i]);
+        }
+        crumbBar.innerHTML = html;
+        crumbBar.hidden = false;
+        crumbBar.scrollLeft = crumbBar.scrollWidth;
+    }
+
+    crumbBar.addEventListener("click", function (e) {
+        var el = e.target.closest(".crumb");
+        if (!el || el.classList.contains("crumb-file")) return;    // file crumb is a no-op label
+        if (!panelOpen()) setProjectOpen(true);
+        if (leftView !== "project") setLeftView("project");
+        var name = el.getAttribute("data-folder");
+        var row = name === "__root__"
+            ? treeEl.querySelector(".tree-root > .tree-row")
+            : treeEl.querySelector('.tree-folder > .tree-row[data-folder="' + name + '"]');
+        if (!row) return;
+        for (var li = row.parentElement; li && li !== treeEl.parentElement; li = li.parentElement) {
+            if (li.classList && li.classList.contains("tree-folder")) li.classList.remove("collapsed");
+        }
+        persistCollapsed();
+        row.scrollIntoView({ block: "nearest" });
+        row.classList.remove("structure-flash");
+        void row.offsetWidth;
+        row.classList.add("structure-flash");
+        setTimeout(function () { row.classList.remove("structure-flash"); }, 1200);
+    });
+
+    // -------------------------------------------------------- recent files
+    function pushRecent(path) {
+        if (!path) return;
+        var i = recent.indexOf(path);
+        if (i !== -1) recent.splice(i, 1);
+        recent.unshift(path);
+        if (recent.length > 15) recent.length = 15;
+        try { localStorage.setItem(LS.recent, JSON.stringify(recent)); } catch (e) {}
+    }
+
+    var rfItems = [];
+    var rfActive = 0;
+
+    function rfOpen() {
+        var pool = recent.filter(function (p) { return fileIndex[p]; });
+        rfItems = pool.filter(function (p) { return p !== state.active; });
+        if (!rfItems.length) rfItems = pool;               // fall back to all if only the current file
+        if (!rfItems.length) {
+            rfList.innerHTML = '<li class="rf-empty">No recent files yet</li>';
+        } else {
+            rfList.innerHTML = rfItems.map(function (p, i) {
+                var m = fileIndex[p];
+                var slash = p.lastIndexOf("/");
+                var dir = slash === -1 ? "" : p.slice(0, slash);
+                return '<li class="rf-row' + (i === 0 ? " active" : "") + '" data-i="' + i + '">'
+                    + '<span class="tree-icon icon-' + (m.icon || "txt") + '"></span>'
+                    + '<span class="rf-name">' + escapeHtml(m.name) + "</span>"
+                    + (dir ? '<span class="rf-sub">' + escapeHtml(dir) + "</span>" : "")
+                    + "</li>";
+            }).join("");
+        }
+        rfActive = 0;
+        rfOverlay.hidden = false;
+    }
+    function rfClose() { rfOverlay.hidden = true; }
+    function rfMove(delta) {
+        var rows = rfList.querySelectorAll(".rf-row");
+        if (!rows.length) return;
+        rows[rfActive].classList.remove("active");
+        rfActive = (rfActive + delta + rows.length) % rows.length;
+        rows[rfActive].classList.add("active");
+        rows[rfActive].scrollIntoView({ block: "nearest" });
+    }
+    function rfExec() {
+        var p = rfItems[rfActive];
+        rfClose();
+        if (p) openFile(p);
+    }
+    rfList.addEventListener("mousemove", function (e) {
+        var row = e.target.closest(".rf-row");
+        if (!row || +row.dataset.i === rfActive) return;
+        var rows = rfList.querySelectorAll(".rf-row");
+        if (rows[rfActive]) rows[rfActive].classList.remove("active");
+        rfActive = +row.dataset.i;
+        row.classList.add("active");
+    });
+    rfList.addEventListener("click", function (e) {
+        var row = e.target.closest(".rf-row");
+        if (!row) return;
+        rfActive = +row.dataset.i;
+        rfExec();
+    });
+    rfOverlay.addEventListener("mousedown", function (e) { if (e.target === rfOverlay) rfClose(); });
 
     // -------------------------------------------------------------- gutter
     function updateGutter() {
@@ -590,7 +706,7 @@
     // ------------------------------------------------------------- toolbar
     function resetLayout() {
         [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.leftView, LS.term, LS.termH,
-         LS.theme, LS.fontSize, LS.lineHeight, LS.presentation].forEach(function (k) {
+         LS.theme, LS.fontSize, LS.lineHeight, LS.presentation, LS.recent].forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
         });
         window.location.href = window.location.pathname;
@@ -650,6 +766,7 @@
             { label: "Toggle Project panel", key: "Alt+1", run: function () { toggleLeft("project"); } },
             { label: "Toggle Structure panel", key: "Alt+7", run: function () { toggleLeft("structure"); } },
             { label: "Settings", key: "Ctrl+Alt+S", run: cfgOpen },
+            { label: "Recent Files…", key: "Ctrl+E", run: rfOpen },
             { label: "Open README.md", key: "", run: function () { openFile(DEFAULT_FILE); } },
             { label: "Reset layout", key: "", run: resetLayout }
         ];
@@ -1073,6 +1190,16 @@
         var mod = e.ctrlKey || e.metaKey;
 
         if (e.defaultPrevented) return;                // already handled (e.g. a modal)
+
+        // Recent Files popup has no input of its own, so it is driven from here
+        if (!rfOverlay.hidden) {
+            if (e.key === "Escape") { e.preventDefault(); rfClose(); }
+            else if (e.key === "ArrowDown" || (mod && e.key.toLowerCase() === "e")) { e.preventDefault(); rfMove(1); }
+            else if (e.key === "ArrowUp") { e.preventDefault(); rfMove(-1); }
+            else if (e.key === "Enter") { e.preventDefault(); rfExec(); }
+            return;
+        }
+
         if (!cfgOverlay.hidden) return;                // settings dialog owns its keys
         if (!gtlOverlay.hidden) return;                // go-to-line owns its keys
         if (!seOverlay.hidden) return;                 // modal owns its keys while open
@@ -1087,6 +1214,12 @@
         if (mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "g") {
             e.preventDefault();
             gtlOpen();
+            return;
+        }
+        // Ctrl/Cmd+E opens Recent Files
+        if (mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "e") {
+            e.preventDefault();
+            rfOpen();
             return;
         }
         // Esc leaves presentation mode
@@ -1162,6 +1295,8 @@
         var termOpen = null;
         try { termOpen = localStorage.getItem(LS.term); } catch (e) {}
         if (termOpen === "1") setTermOpen(true);
+
+        recent = readJSON(LS.recent, []).filter(function (p) { return fileIndex[p]; });
 
         // restore open tabs
         var storedPaths = readJSON(LS.tabs, []);
