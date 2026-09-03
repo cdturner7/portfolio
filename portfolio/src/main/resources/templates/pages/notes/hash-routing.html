@@ -1,0 +1,48 @@
+<!--/* notes/hash-routing.md - rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <div class="frontmatter">---
+title: Hash routing that respects the Back button
+tags: [frontend, routing, history-api]
+---</div>
+
+    <h1>Hash routing that respects the Back button</h1>
+    <p>
+        The first version deep&#8209;linked files with <code>?file=About.md</code> and
+        <code>history.replaceState</code>. It worked, but <em>replace</em> writes no history entry, so
+        browser Back and Forward did nothing. Opening five files and hitting Back left you on the same file.
+    </p>
+
+    <h2>Switch to the hash</h2>
+    <p>
+        The canonical location is now the URL hash &mdash; <code>#/Experience.md</code>, or <code>#/</code>
+        for the welcome screen. Setting <code>location.hash</code> pushes a real history entry, so Back and
+        Forward move through the files you opened. A single <code>hashchange</code> listener re&#8209;opens
+        whatever the hash points at.
+    </p>
+
+    <h2>Break the feedback loop</h2>
+    <p>
+        The catch: <code>setActive()</code> writes the hash, and the <code>hashchange</code> it triggers
+        would call <code>setActive()</code> again. Two guards handle it:
+    </p>
+    <pre><code class="language-bash">suppressHash   # set while the hashchange handler runs, so its openFile() writes nothing
+p === active   # the handler bails early when the hash already matches the open file</code></pre>
+    <p>
+        During start&#8209;up a <code>booting</code> flag makes every write a <code>replaceState</code>
+        instead of a push, so the first load never leaves a dangling entry.
+    </p>
+
+    <h2>Keep the old links working</h2>
+    <p>
+        <code>?file=</code> URLs are still honoured once, on load: the value is resolved, the query param
+        is stripped with <code>replaceState</code>, and the app settles on the hash form. Old bookmarks
+        keep working; new ones are clean.
+    </p>
+
+    <blockquote>Cost of the whole feature: about 30 lines, one event listener, two booleans.</blockquote>
+</article>
+</body>
+</html>

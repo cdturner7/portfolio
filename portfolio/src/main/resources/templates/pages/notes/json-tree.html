@@ -1,0 +1,54 @@
+<!--/* notes/json-tree.md - rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <div class="frontmatter">---
+title: A collapsible JSON tree in ~70 lines, no library
+tags: [frontend, json, no-dependencies]
+---</div>
+
+    <h1>A collapsible JSON tree in ~70 lines, no library</h1>
+    <p>
+        <code>Skills.json</code> in the tree is real JSON rendered as an IntelliJ&#8209;style folding tree.
+        No editor component, no <code>JSON.stringify</code> with a replacer &mdash; just a small recursive
+        HTML builder.
+    </p>
+
+    <h2>Ship the data as data</h2>
+    <p>
+        The fragment carries the actual object in a script tag the browser will not execute, and
+        <code>ide.js</code> reads its text and parses it:
+    </p>
+    <pre><code class="language-json">&lt;script type="application/json" id="skills-json"&gt;
+{ "categories": { "languages": [ { "name": "Java", "level": "advanced" } ] } }
+&lt;/script&gt;</code></pre>
+
+    <h2>One recursive builder</h2>
+    <p>
+        <code>jtBuild(key, value, depth)</code> returns an HTML string. Primitives become a coloured
+        <code>&lt;span&gt;</code>. Objects and arrays become a <code>.jt-node</code> with a clickable header
+        row (open bracket + child count), a <code>.jt-children</code> block, and a closing row. A small
+        <code>jtIsFlat()</code> check renders short all&#8209;primitive objects like
+        <code>{ "name": "Java", "level": "advanced" }</code> inline on one line, which is what keeps the
+        skills list readable.
+    </p>
+
+    <h2>Folding is a class, not a &lt;details&gt;</h2>
+    <p>
+        Collapsing is entirely CSS. A click toggles <code>.collapsed</code> on the node; the rest is two
+        rules:
+    </p>
+    <pre><code class="language-bash">.jt-node.collapsed &gt; .jt-children,
+.jt-node.collapsed &gt; .jt-close { display: none; }
+.jt-node.collapsed &gt; .jt-row .jt-preview { display: inline; }  /* the " ... }" hint */</code></pre>
+    <p>
+        Nodes at depth &ge; 2 (the per&#8209;category arrays) get <code>.collapsed</code> from the start, so
+        the file opens as a tidy list of category names. &ldquo;Expand all&rdquo; just walks
+        <code>.jt-node</code> and clears the class.
+    </p>
+
+    <blockquote>Colours reuse the same <code>--syn-*</code> CSS variables as the code highlighter, so the tree matches every theme for free.</blockquote>
+</article>
+</body>
+</html>

@@ -43,6 +43,15 @@ public class ProjectStructure {
                 "pages/projects/portfolio-site :: content"));
         root.add(projects);
 
+        ProjectNode notes = ProjectNode.folder("notes");
+        notes.add(ProjectNode.file("ide-shell.md", "notes/ide-shell.md", "md", "Markdown",
+                "pages/notes/ide-shell :: content"));
+        notes.add(ProjectNode.file("json-tree.md", "notes/json-tree.md", "md", "Markdown",
+                "pages/notes/json-tree :: content"));
+        notes.add(ProjectNode.file("hash-routing.md", "notes/hash-routing.md", "md", "Markdown",
+                "pages/notes/hash-routing :: content"));
+        root.add(notes);
+
         ProjectNode config = ProjectNode.folder(".config").collapsed();
         config.add(ProjectNode.file("style-guide.html", ".config/style-guide.html", "html", "HTML",
                 "pages/config/style-guide :: content"));

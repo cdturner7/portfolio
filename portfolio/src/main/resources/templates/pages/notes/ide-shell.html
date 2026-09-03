@@ -1,0 +1,60 @@
+<!--/* notes/ide-shell.md - rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <div class="frontmatter">---
+title: Faking an IDE with Spring Boot and vanilla JS
+tags: [thymeleaf, spring-boot, frontend]
+---</div>
+
+    <h1>Faking an IDE with Spring Boot and vanilla JS</h1>
+    <p>
+        The whole site is one page dressed up as IntelliJ IDEA. There is no SPA framework and no build
+        step for the front end &mdash; just a Spring Boot server, Thymeleaf fragments, and a single
+        hand&#8209;rolled <code>ide.js</code>.
+    </p>
+
+    <h2>The tree is server data</h2>
+    <p>
+        A <code>ProjectStructure</code> bean holds the fake project tree and a flat
+        <code>path &rarr; node</code> map. The home controller renders the tree into the left tool window
+        server&#8209;side; nothing about the file list is decided on the client.
+    </p>
+    <pre><code class="language-java">root.add(ProjectNode.file(
+    "Skills.json", "Skills.json", "json", "JSON",
+    "pages/skills :: content"));   // the Thymeleaf fragment to serve</code></pre>
+
+    <h2>Opening a file is a fetch</h2>
+    <p>
+        Clicking a tree row or a tab calls <code>openFile(path)</code>. The pane for that path is created
+        once, then <code>/content?path=&hellip;</code> is fetched and the returned fragment is dropped in
+        with <code>innerHTML</code>. Subsequent opens just un&#8209;hide the cached pane, so switching tabs
+        is instant and the server is hit at most once per file.
+    </p>
+    <pre><code class="language-bash">GET /content?path=Skills.json
+&rarr; ContentController.findByPath("Skills.json").getFragment()
+&rarr; "pages/skills :: content"   # Thymeleaf renders just that fragment</code></pre>
+    <p>
+        Because fragments arrive as a string and go in through <code>innerHTML</code>, any
+        <code>&lt;script&gt;</code> inside them never runs. Panes that need behaviour (the JSON tree, the
+        resume viewer, the contact form) are wired from <code>ide.js</code> with delegated listeners on the
+        pane host instead.
+    </p>
+
+    <h2>State lives in localStorage</h2>
+    <p>
+        Open tabs and their order, the active file, folder collapse state, panel widths, the theme, the
+        terminal &mdash; all of it is written to <code>localStorage</code> under an <code>ide.*</code>
+        namespace, so a refresh drops you back exactly where you were. The URL hash carries the active
+        file on top of that, which is its own note.
+    </p>
+
+    <blockquote>
+        Trade&#8209;off: no framework means no free reactivity, so every view has an explicit
+        <code>render*</code> function. For a surface this small that is a feature &mdash; the data flow is
+        completely legible.
+    </blockquote>
+</article>
+</body>
+</html>
