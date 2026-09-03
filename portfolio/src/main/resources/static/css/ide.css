@@ -851,6 +851,25 @@ body.project-collapsed .ide-resizer { display: none; }
 .doc .links a:hover { border-color: var(--ide-accent); background: var(--ide-hover); text-decoration: none; }
 .doc .links svg { width: 16px; height: 16px; fill: currentColor; }
 
+/* shields-style badges (README.md) */
+.doc .badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 18px; }
+.doc .badge {
+    display: inline-flex;
+    align-items: stretch;
+    border: 1px solid var(--ide-border);
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: var(--mono-font);
+    font-size: 11px;
+    line-height: 1;
+    text-decoration: none;
+}
+.doc a.badge:hover { border-color: var(--ide-accent); text-decoration: none; }
+.doc .badge-k { padding: 4px 7px; background: var(--ide-bg-panel); color: var(--ide-fg-dim); }
+.doc .badge-v { padding: 4px 7px; background: var(--code-bg); color: var(--ide-fg); }
+.doc .badge-live { background: rgba(95, 184, 101, .18); color: var(--ide-run); }
+.doc .badge-src { color: var(--syn-func); }
+
 /* contact form (Contact.md) */
 .cform { max-width: 460px; margin: 12px 0 20px; }
 .cform-row { margin-bottom: 10px; }

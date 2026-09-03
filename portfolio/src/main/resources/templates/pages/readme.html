@@ -4,6 +4,16 @@
 <body>
 <article class="doc doc-md" th:fragment="content">
     <h1>portfolio</h1>
+    <p class="badges">
+        <a class="badge" href="https://portfolio-970392287693.us-east1.run.app" target="_blank" rel="noopener">
+            <span class="badge-k">deploy</span><span class="badge-v badge-live">Cloud&nbsp;Run &bull; live</span>
+        </a>
+        <span class="badge"><span class="badge-k">spring&nbsp;boot</span><span class="badge-v">4.1.1</span></span>
+        <span class="badge"><span class="badge-k">java</span><span class="badge-v">21</span></span>
+        <a class="badge" href="https://github.com/cdturner7/portfolio" target="_blank" rel="noopener">
+            <span class="badge-k">source</span><span class="badge-v badge-src">github</span>
+        </a>
+    </p>
     <p>
         Welcome. This is <strong>Collin Turner's</strong> portfolio &mdash; and yes, the whole site is dressed
         up as <strong>IntelliJ IDEA</strong>. The panel on the left is the project tree; click a file and it
@@ -18,12 +28,13 @@
         <li><code>Skills.json</code> &mdash; the tech, as a config file</li>
         <li><code>Projects/</code> &mdash; things I've built, including this site</li>
         <li><code>notes/</code> &mdash; short write-ups on how parts of this site work</li>
+        <li><code>dependencies.json</code> &mdash; the real toolchain; <code>CHANGELOG.md</code> &mdash; what shipped when</li>
         <li><code>Contact.md</code> &mdash; how to reach me</li>
     </ul>
 
     <h2>About this build</h2>
     <p>
-        A <strong>Spring Boot 3.5</strong> app (Java 21) serving <strong>Thymeleaf</strong> fragments over a
+        A <strong>Spring Boot 4.1</strong> app (Java 21) serving <strong>Thymeleaf</strong> fragments over a
         vanilla-JS editor shell. Each "file" is a fragment fetched on demand; open tabs, layout, and the
         active file are kept in <code>localStorage</code>, so a refresh drops you back where you were. Every
         file is also deep-linkable with a <code>#/</code> URL hash, and browser back/forward walk your history.

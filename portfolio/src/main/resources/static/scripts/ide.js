@@ -1307,14 +1307,17 @@
     var termHistIdx = 0;
     var termReady = false;
 
-    // snapshot of `git log` - refreshed by hand when it drifts too far
+    // snapshot of `git log` - refreshed by hand when it drifts too far; the
+    // full history lives in CHANGELOG.md
     var GIT_LOG = [
-        { h: "9eb80e4", d: "2026-09-01", s: "Syntax-highlight code panes; Skills.json is now real JSON" },
-        { h: "6beda7c", d: "2026-09-01", s: "Add TODO backlog page; implement Search Everywhere (Double-Shift)" },
-        { h: "74b4b53", d: "2026-08-27", s: "DEPLOY.md: record live URL/project and the run-from-portfolio/ gotcha" },
-        { h: "31015d4", d: "2026-08-27", s: "Remove stock/Alpha Vantage feature; upgrade to Spring Boot 4.1.1" },
-        { h: "646b1aa", d: "2026-08-27", s: "Add Cloud Run deployment setup" },
-        { h: "8ba0731", d: "2026-08-26", s: "Reskin the site as the IntelliJ IDEA (New UI dark) IDE" }
+        { h: "a73fa77", d: "2026-09-03", s: "Add a contact form to Contact.md (mailto compose + copy)" },
+        { h: "495819f", d: "2026-09-03", s: "Render Skills.json as a real, collapsible JSON tree" },
+        { h: "ec189f8", d: "2026-09-03", s: "Add a Resume.pdf tree entry with an embedded document viewer" },
+        { h: "b4537af", d: "2026-09-02", s: "Route by URL hash so browser back/forward walk file history" },
+        { h: "8bfc5eb", d: "2026-09-02", s: "Add a mobile fallback: Project panel becomes a slide-in drawer" },
+        { h: "fd2764f", d: "2026-09-02", s: "Add a keyboard-shortcuts cheat-sheet (F1 / ?)" },
+        { h: "b4d5f1a", d: "2026-09-02", s: "Add IntelliJ-style notification balloons" },
+        { h: "0af499b", d: "2026-09-02", s: "Make the bottom tool window tabbed: Problems / TODO / Git log / Terminal" }
     ];
 
     function termScroll() { termEl.scrollTop = termEl.scrollHeight; }

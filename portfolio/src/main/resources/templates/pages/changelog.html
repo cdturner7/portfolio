@@ -1,0 +1,65 @@
+<!--/* CHANGELOG.md - rendered into the IDE editor pane */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="doc doc-md" th:fragment="content">
+    <div class="frontmatter">---
+format: keep-a-changelog (ish)
+source: git log
+---</div>
+
+    <h1>Changelog</h1>
+    <p>Notable changes to this site, newest first. Dates are commit dates.</p>
+
+    <h2>2026-09-03</h2>
+    <ul>
+        <li><code>notes/</code> folder with three build write-ups (IDE shell, JSON tree, hash routing).</li>
+        <li><code>Contact.md</code> gains a working form &mdash; composes a <code>mailto:</code>, with a
+            copy-to-clipboard fallback.</li>
+        <li><code>Skills.json</code> is now real JSON rendered as a collapsible tree with per-skill
+            proficiency.</li>
+        <li><code>Resume.pdf</code> tree entry &mdash; an embedded document viewer over a standalone
+            <code>/resume</code> page, with Print / Save as PDF.</li>
+    </ul>
+
+    <h2>2026-09-02</h2>
+    <ul>
+        <li>Routing moved to the URL hash (<code>#/Experience.md</code>); browser back/forward now walk
+            your open-file history.</li>
+        <li>Mobile fallback &mdash; below ~640px the Project panel becomes a slide-in drawer.</li>
+        <li>Keyboard-shortcuts cheat-sheet (<kbd>F1</kbd> / <kbd>?</kbd>).</li>
+        <li>IntelliJ-style notification balloons, including an &ldquo;indexing / build&rdquo; pair on load.</li>
+        <li>Bottom tool window is tabbed: Problems / TODO / Git log / Terminal.</li>
+        <li>Right-click context menus on tree rows and tabs.</li>
+        <li>Recent Files popup (<kbd>Ctrl</kbd>+<kbd>E</kbd>) and a breadcrumb bar.</li>
+        <li>Live caret tracking, current-line highlight, and Go to line (<kbd>Ctrl</kbd>+<kbd>G</kbd>).</li>
+    </ul>
+
+    <h2>2026-09-01</h2>
+    <ul>
+        <li>Settings dialog &mdash; theme, editor font size, line height, presentation mode.</li>
+        <li>Structure tool window (<kbd>Alt</kbd>+<kbd>7</kbd>).</li>
+        <li>Terminal bottom tool window that types back.</li>
+        <li>Client-side syntax highlighting for the code panes.</li>
+        <li>TODO backlog page and Search Everywhere (double-<kbd>Shift</kbd>).</li>
+        <li>Shipped work tracked in a Features list instead of a &ldquo;Done&rdquo; section.</li>
+    </ul>
+
+    <h2>2026-08-26 &ndash; 27</h2>
+    <ul>
+        <li>Reskinned the whole site as the IntelliJ IDEA &ldquo;New UI&rdquo; dark theme.</li>
+        <li>Added Google Cloud Run deployment (multi-stage <code>Dockerfile</code>, scale-to-zero).</li>
+        <li>Upgraded to Spring Boot 4.1.1; removed an earlier stock-quote feature.</li>
+    </ul>
+
+    <h2>2024</h2>
+    <ul>
+        <li>Earlier lives of the site: a first IDE-homepage attempt with a draggable mini-map, some
+            three.js experiments, and the original Spring Boot project scaffold.</li>
+    </ul>
+
+    <hr/>
+    <p>The running list of what's <em>next</em> lives in <code>TODO.md</code>.</p>
+</article>
+</body>
+</html>

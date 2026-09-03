@@ -1,0 +1,44 @@
+<!--/* dependencies.json - the real toolchain, rendered as a collapsible tree by renderJsonPane() */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="jsonview" th:fragment="content">
+    <div class="jsonbar">
+        <span class="jsonbar-name">dependencies.json</span>
+        <span class="jsonbar-hint">from pom.xml and the Dockerfile</span>
+        <span class="jsonbar-spacer"></span>
+        <button type="button" class="jsonbar-btn" data-jt="collapse">Collapse all</button>
+        <button type="button" class="jsonbar-btn" data-jt="expand">Expand all</button>
+    </div>
+    <div class="jsontree" id="depstree"></div>
+    <script type="application/json" id="deps-json">
+{
+  "runtime": { "java": "21", "springBoot": "4.1.1", "build": "Maven (mvnw wrapper)" },
+  "maven": {
+    "parent": "spring-boot-starter-parent:4.1.1",
+    "dependencies": [
+      { "artifact": "spring-boot-starter-web", "group": "org.springframework.boot" },
+      { "artifact": "spring-boot-starter-thymeleaf", "group": "org.springframework.boot" },
+      { "artifact": "thymeleaf-layout-dialect", "group": "nz.net.ultraq.thymeleaf" },
+      { "artifact": "commons-lang3", "group": "org.apache.commons" },
+      { "artifact": "spring-boot-starter-test", "group": "org.springframework.boot", "scope": "test" }
+    ],
+    "plugins": ["spring-boot-maven-plugin"]
+  },
+  "frontend": {
+    "framework": "none",
+    "javascript": "one hand-rolled ide.js, no bundler",
+    "css": "one ide.css approximating the IntelliJ New UI dark theme",
+    "fonts": ["Inter", "JetBrains Mono"]
+  },
+  "deploy": {
+    "platform": "Google Cloud Run",
+    "region": "us-east1",
+    "image": "multi-stage Dockerfile",
+    "scaleToZero": true
+  }
+}
+    </script>
+</div>
+</body>
+</html>
