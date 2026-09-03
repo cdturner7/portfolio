@@ -45,6 +45,7 @@
     var stCaret = document.getElementById("st-caret");
     var projectPanel = document.getElementById("ide-project");
     var resizer = document.getElementById("ide-resizer");
+    var drawerScrim = document.getElementById("drawer-scrim");
     var searchInput = document.getElementById("tb-search-input");
     var stLang = document.getElementById("st-lang");
     var stFile = document.getElementById("st-file");
@@ -352,6 +353,7 @@
         renderCrumbs(path);
         resetCaret();
         refreshStructureIfVisible();
+        closeDrawerOnNav();
         save();
         var url = new URL(window.location.href);
         url.searchParams.set("file", path);
@@ -789,7 +791,21 @@
     var stripeStructureBtn = document.getElementById("stripe-structure");
     var structureList = document.getElementById("structure-list");
 
-    function panelOpen() { return !document.body.classList.contains("project-collapsed"); }
+    // below ~640px the Project panel is an overlay drawer, not a flex column
+    var narrowMQ = window.matchMedia("(max-width: 640px)");
+    function isNarrow() { return narrowMQ.matches; }
+
+    function setDrawer(open) {
+        document.body.classList.toggle("drawer-open", open);
+        drawerScrim.hidden = !open;
+    }
+    function closeDrawerOnNav() { if (isNarrow()) setDrawer(false); }
+
+    function panelOpen() {
+        return isNarrow()
+            ? document.body.classList.contains("drawer-open")
+            : !document.body.classList.contains("project-collapsed");
+    }
 
     function syncStripe() {
         var open = panelOpen();
@@ -798,10 +814,25 @@
     }
 
     function setProjectOpen(open) {
-        document.body.classList.toggle("project-collapsed", !open);
-        try { localStorage.setItem(LS.panel, open ? "1" : "0"); } catch (e) {}
+        if (isNarrow()) {
+            setDrawer(open);
+        } else {
+            document.body.classList.toggle("project-collapsed", !open);
+            try { localStorage.setItem(LS.panel, open ? "1" : "0"); } catch (e) {}
+        }
         syncStripe();
     }
+
+    drawerScrim.addEventListener("click", function () { setDrawer(false); syncStripe(); });
+    narrowMQ.addEventListener("change", function () {
+        setDrawer(false);
+        if (!isNarrow()) {
+            var stored = "1";
+            try { stored = localStorage.getItem(LS.panel); } catch (e) {}
+            document.body.classList.toggle("project-collapsed", stored === "0");
+        }
+        syncStripe();
+    });
 
     function setLeftView(view) {
         leftView = view;
@@ -867,6 +898,7 @@
         setTimeout(function () { h.classList.remove("structure-flash"); }, 1200);
         var rows = structureList.querySelectorAll(".structure-row");
         for (var i = 0; i < rows.length; i++) rows[i].classList.toggle("selected", rows[i] === row);
+        closeDrawerOnNav();
     });
 
     stripeProjectBtn.addEventListener("click", function () { toggleLeft("project"); });
@@ -904,7 +936,7 @@
 
     document.getElementById("tb-run").addEventListener("click", function () { openFile(DEFAULT_FILE); });
     document.getElementById("tb-menu").addEventListener("click", function () {
-        setProjectOpen(document.body.classList.contains("project-collapsed"));
+        setProjectOpen(!panelOpen());
     });
     document.getElementById("tb-settings").addEventListener("click", cfgOpen);
 
@@ -1630,7 +1662,8 @@
         try { storedView = localStorage.getItem(LS.leftView); } catch (e) {}
         leftView = storedView === "structure" ? "structure" : "project";
         setLeftView(leftView);
-        setProjectOpen(storedPanel === null ? true : storedPanel === "1");
+        if (isNarrow()) { setDrawer(false); syncStripe(); }   // drawer starts closed on mobile
+        else setProjectOpen(storedPanel === null ? true : storedPanel === "1");
 
         var storedTermH = null;
         try { storedTermH = localStorage.getItem(LS.termH); } catch (e) {}
