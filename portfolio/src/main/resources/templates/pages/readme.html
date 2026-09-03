@@ -14,6 +14,7 @@
     <ul>
         <li><code>About.md</code> &mdash; who I am and what I work on</li>
         <li><code>Experience.md</code> &mdash; work history</li>
+        <li><code>Resume.pdf</code> &mdash; the one-pager; print or save it straight from the tab</li>
         <li><code>Skills.json</code> &mdash; the tech, as a config file</li>
         <li><code>Projects/</code> &mdash; things I've built, including this site</li>
         <li><code>Contact.md</code> &mdash; how to reach me</li>
@@ -24,7 +25,7 @@
         A <strong>Spring Boot 3.5</strong> app (Java 21) serving <strong>Thymeleaf</strong> fragments over a
         vanilla-JS editor shell. Each "file" is a fragment fetched on demand; open tabs, layout, and the
         active file are kept in <code>localStorage</code>, so a refresh drops you back where you were. Every
-        file is also deep-linkable with <code>?file=</code>.
+        file is also deep-linkable with a <code>#/</code> URL hash, and browser back/forward walk your history.
     </p>
 
     <blockquote>Tip: <code>Alt + W</code> closes the current tab (middle-click a tab works too). <code>Alt + 1</code> toggles the project panel. The gear icon resets the layout.</blockquote>

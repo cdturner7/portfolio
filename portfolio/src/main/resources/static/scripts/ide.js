@@ -388,15 +388,40 @@
                     contentLoaded[path] = true;
                     pane.innerHTML = html;
                     highlightCode(pane);
-                    if (state.active === path) { updateGutter(); refreshStructureIfVisible(); }
+                    enhancePdfPane(pane);
+                    if (state.active === path) {
+                        gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview"));
+                        updateGutter();
+                        refreshStructureIfVisible();
+                    }
                 })
                 .catch(function () {
                     pane.innerHTML = '<div class="doc-error">Could not load "' + path + '".</div>';
                 });
         } else {
+            gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview"));
             updateGutter();
         }
     }
+
+    // Resume.pdf pane: fit the embedded viewer to its content once it loads
+    function enhancePdfPane(pane) {
+        var frame = pane.querySelector(".pdfframe");
+        if (!frame) return;
+        frame.addEventListener("load", function () {
+            try {
+                var d = frame.contentDocument;
+                if (d) frame.style.height = Math.max(320, d.documentElement.scrollHeight + 2) + "px";
+            } catch (e) { /* cross-origin, shouldn't happen for /resume */ }
+        });
+    }
+
+    paneHost.addEventListener("click", function (e) {
+        if (!e.target.closest("[data-pdf-print]")) return;
+        var frame = paneHost.querySelector(".editor-doc:not([hidden]) .pdfframe");
+        try { (frame && frame.contentWindow ? frame.contentWindow : window).print(); }
+        catch (err) { window.print(); }
+    });
 
     function closeTab(path) {
         var i = state.tabs.findIndex(function (t) { return t.path === path; });

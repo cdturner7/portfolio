@@ -1,0 +1,17 @@
+<!--/* Resume.pdf - rendered into the IDE editor pane as an embedded PDF-style viewer */-->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="pdfview" th:fragment="content">
+    <div class="pdfbar">
+        <span class="pdfbar-name">Resume.pdf</span>
+        <span class="pdfbar-spacer"></span>
+        <button type="button" class="pdfbar-btn" data-pdf-print>Print / Save as PDF</button>
+        <a class="pdfbar-btn" th:href="@{/resume}" target="_blank" rel="noopener">Open in new tab</a>
+    </div>
+    <div class="pdfstage">
+        <iframe class="pdfframe" th:src="@{/resume}" title="Collin Turner &ndash; Resume" loading="lazy"></iframe>
+    </div>
+</div>
+</body>
+</html>
