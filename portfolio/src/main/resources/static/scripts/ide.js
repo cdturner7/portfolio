@@ -355,9 +355,7 @@
         refreshStructureIfVisible();
         closeDrawerOnNav();
         save();
-        var url = new URL(window.location.href);
-        url.searchParams.set("file", path);
-        window.history.replaceState(null, "", url);
+        syncHash(path);
     }
 
     function paneFor(path) {
@@ -433,10 +431,39 @@
         resetCaret();
         refreshStructureIfVisible();
         save();
-        var url = new URL(window.location.href);
-        url.searchParams.delete("file");
-        window.history.replaceState(null, "", url);
+        syncHash(null);
     }
+
+    // --------------------------------------------------------------- routing
+    // The canonical location is the URL hash (#/Experience.md, #/ for the
+    // welcome screen); back/forward work because each open pushes a hash
+    // entry. ?file= is still honoured once, on load, then rewritten to a hash.
+    var booting = true;         // during init we replace rather than push
+    var suppressHash = false;   // true while reacting to a hashchange
+
+    function hashForPath(path) { return "#/" + (path || ""); }
+    function pathFromHash() {
+        var h = decodeURIComponent(window.location.hash || "");
+        return h.replace(/^#/, "").replace(/^\//, "");
+    }
+    function syncHash(path) {
+        if (suppressHash) return;
+        var want = hashForPath(path);
+        if (window.location.hash === want) return;
+        if (booting) {
+            window.history.replaceState(null, "", window.location.pathname + window.location.search + want);
+        } else {
+            window.location.hash = want;                 // adds a history entry
+        }
+    }
+    window.addEventListener("hashchange", function () {
+        var p = pathFromHash();
+        if (p === (state.active || "")) return;          // our own syncHash echo
+        suppressHash = true;
+        if (p && fileIndex[p]) openFile(p);
+        else if (!p) showWelcome();
+        suppressHash = false;
+    });
 
     // ----------------------------------------------------------- status bar
     function updateStatus(path) {
@@ -647,7 +674,8 @@
     }
     function fileLink(path) {
         var u = new URL(window.location.href);
-        u.searchParams.set("file", path);
+        u.searchParams.delete("file");
+        u.hash = hashForPath(path);
         return u.toString();
     }
 
@@ -1685,13 +1713,20 @@
             if (fileIndex[p]) state.tabs.push(fileIndex[p]);
         });
 
+        var hashPath = pathFromHash();
         var params = new URLSearchParams(window.location.search);
-        var wanted = params.get("file");
+        var legacyFile = params.get("file");
+        if (legacyFile) {                       // migrate ?file= to a hash, once
+            var u = new URL(window.location.href);
+            u.searchParams.delete("file");
+            window.history.replaceState(null, "", u.pathname + u.search + u.hash);
+        }
         var storedActive = null;
         try { storedActive = localStorage.getItem(LS.active); } catch (e) {}
 
         var target = null;
-        if (wanted && fileIndex[wanted]) target = wanted;
+        if (hashPath && fileIndex[hashPath]) target = hashPath;
+        else if (legacyFile && fileIndex[legacyFile]) target = legacyFile;
         else if (storedActive && fileIndex[storedActive]) target = storedActive;
         else if (state.tabs.length) target = state.tabs[0].path;
 
@@ -1699,6 +1734,7 @@
         else if (!state.tabs.length) openFile(DEFAULT_FILE);
         else { renderTabs(); showWelcome(); }
 
+        booting = false;
         startupToasts();
     }
 

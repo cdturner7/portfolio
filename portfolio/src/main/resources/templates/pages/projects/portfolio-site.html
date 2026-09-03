@@ -57,7 +57,8 @@
             over the editor as a drawer with a tap&#8209;to&#8209;dismiss scrim; opening a file closes it, so the
             editor always gets the full width.</li>
         <li><strong>Persistent layout</strong> &mdash; open tabs, the active file, tree state, panel sizes and
-            the terminal all survive a refresh; every file is deep&#8209;linkable with <code>?file=</code>.</li>
+            the terminal all survive a refresh; every file is deep&#8209;linkable with a
+            <code>#/Experience.md</code> hash, and browser back/forward walk your open history.</li>
     </ul>
 
     <h2>How it works</h2>
@@ -66,7 +67,8 @@
         <li>Opening a file <code>fetch()</code>es <code>/content?path=&hellip;</code>, which returns a Thymeleaf
             fragment that gets injected into a cached editor pane.</li>
         <li>Open tabs, order, the active file, folder collapse state and panel width all live in
-            <code>localStorage</code>; deep links use <code>?file=</code>.</li>
+            <code>localStorage</code>; deep links use the URL hash (<code>#/Path/file.md</code>), with legacy
+            <code>?file=</code> links migrated on load.</li>
         <li>Tabs drag to reorder, close on middle-click or <code>Ctrl/Cmd+W</code>, and the gutter line
             numbers are generated to match content height.</li>
     </ul>
