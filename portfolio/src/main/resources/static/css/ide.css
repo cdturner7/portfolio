@@ -837,6 +837,7 @@ body.project-collapsed .ide-resizer { display: none; }
 .doc .timeline { border-left: 2px solid var(--ide-border); margin: 16px 0; padding-left: 20px; }
 .doc .timeline .role { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .doc .timeline .when { color: var(--ide-fg-faint); font-family: var(--mono-font); font-size: 12px; white-space: nowrap; }
+.doc .role-tags { margin: 8px 0 0; }
 
 .doc .links { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
 .doc .links a {
