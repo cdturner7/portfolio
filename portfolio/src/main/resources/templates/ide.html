@@ -103,21 +103,31 @@
         </main>
     </div>
 
-    <!-- ===== bottom tool window: Terminal ===== -->
-    <section class="ide-bottom" id="ide-bottom" hidden aria-label="Terminal tool window">
+    <!-- ===== bottom tool window ===== -->
+    <section class="ide-bottom" id="ide-bottom" hidden aria-label="Bottom tool window">
         <div class="bottom-resizer" id="bottom-resizer" title="Drag to resize"></div>
-        <div class="bottom-tabs">
-            <button class="bottom-tab active" type="button">Terminal</button>
+        <div class="bottom-tabs" id="bottom-tabs">
+            <button class="bottom-tab" type="button" data-btab="problems">Problems</button>
+            <button class="bottom-tab" type="button" data-btab="todo">TODO</button>
+            <button class="bottom-tab" type="button" data-btab="gitlog">Git log</button>
+            <button class="bottom-tab active" type="button" data-btab="terminal">Terminal</button>
             <div class="bottom-spacer"></div>
-            <button class="bottom-close" id="bottom-close" type="button" title="Hide (Alt+F12)" aria-label="Hide terminal">&times;</button>
+            <button class="bottom-close" id="bottom-close" type="button" title="Hide (Alt+F12)" aria-label="Hide tool window">&times;</button>
         </div>
-        <div class="bottom-body">
-            <div class="term" id="term">
-                <div class="term-output" id="term-output"></div>
-                <div class="term-inputline">
-                    <span class="term-prompt">collin@portfolio:~$</span>
-                    <input id="term-input" class="term-input" type="text" autocomplete="off"
-                           autocapitalize="off" spellcheck="false" aria-label="Terminal input"/>
+        <div class="bottom-body" id="bottom-body">
+            <div class="bpanel" id="bpanel-problems" data-bpanel="problems" hidden>
+                <div class="bpanel-empty"><span class="bok">&#10003;</span> No problems found in the project.</div>
+            </div>
+            <div class="bpanel" id="bpanel-todo" data-bpanel="todo" hidden></div>
+            <div class="bpanel" id="bpanel-gitlog" data-bpanel="gitlog" hidden></div>
+            <div class="bpanel" id="bpanel-terminal" data-bpanel="terminal">
+                <div class="term" id="term">
+                    <div class="term-output" id="term-output"></div>
+                    <div class="term-inputline">
+                        <span class="term-prompt">collin@portfolio:~$</span>
+                        <input id="term-input" class="term-input" type="text" autocomplete="off"
+                               autocapitalize="off" spellcheck="false" aria-label="Terminal input"/>
+                    </div>
                 </div>
             </div>
         </div>

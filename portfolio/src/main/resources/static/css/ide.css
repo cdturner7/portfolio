@@ -867,6 +867,49 @@ body.project-collapsed .ide-resizer { display: none; }
 
 .bottom-body { flex: 1; min-height: 0; overflow: hidden; }
 
+/* bottom tool-window panels (Problems / TODO / Git log / Terminal) */
+.bpanel {
+    height: 100%;
+    overflow-y: auto;
+    padding: 8px 12px;
+    font: 400 12.5px/1.6 var(--mono-font);
+    color: var(--ide-fg-editor);
+}
+.bpanel[hidden] { display: none; }
+#bpanel-terminal { padding: 0; overflow: hidden; }
+
+.bpanel-empty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 4px;
+    color: var(--ide-fg-faint);
+}
+.bok { color: var(--ide-run); font-weight: 700; }
+
+.bsection {
+    margin: 12px 6px 4px;
+    color: var(--ide-fg-faint);
+    font-size: 10.5px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+.bsection:first-child { margin-top: 2px; }
+
+.brow {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+.brow[data-open] { cursor: pointer; }
+.brow[data-open]:hover { background: var(--ide-hover); }
+.brow .bmark { flex: none; color: var(--syn-comment); }
+.brow .bhash { flex: none; color: var(--syn-func); }
+.brow .btext { flex: 1; min-width: 0; }
+.brow .bdate { flex: none; margin-left: auto; padding-left: 12px; color: var(--ide-fg-faint); }
+
 /* ============================================================ terminal */
 .term {
     height: 100%;

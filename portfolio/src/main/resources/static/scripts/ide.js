@@ -21,6 +21,7 @@
         leftView: "ide.leftView",
         term: "ide.termOpen",
         termH: "ide.termHeight",
+        bottomTab: "ide.bottomTab",
         theme: "ide.theme",
         fontSize: "ide.fontSize",
         lineHeight: "ide.lineHeight",
@@ -852,7 +853,7 @@
     // ------------------------------------------------------------- toolbar
     function resetLayout() {
         [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.leftView, LS.term, LS.termH,
-         LS.theme, LS.fontSize, LS.lineHeight, LS.presentation, LS.recent].forEach(function (k) {
+         LS.bottomTab, LS.theme, LS.fontSize, LS.lineHeight, LS.presentation, LS.recent].forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
         });
         window.location.href = window.location.pathname;
@@ -1049,12 +1050,16 @@
         if (e.target === seOverlay) seClose();
     });
 
-    // ----------------------------------------------------------- terminal
+    // ------------------------------------------- bottom tool window + terminal
     var termPanel = document.getElementById("ide-bottom");
     var termEl = document.getElementById("term");
     var termOut = document.getElementById("term-output");
     var termInput = document.getElementById("term-input");
     var stripeTerminal = document.getElementById("stripe-terminal");
+    var bottomTabsEl = document.getElementById("bottom-tabs");
+    var bottomBodyEl = document.getElementById("bottom-body");
+    var BOTTOM_TABS = ["problems", "todo", "gitlog", "terminal"];
+    var bottomTab = "terminal";
     var termHistory = [];
     var termHistIdx = 0;
     var termReady = false;
@@ -1201,18 +1206,84 @@
         );
     }
 
+    // ---- Git log panel (reuses the GIT_LOG snapshot above) ----
+    var gitLogBuilt = false;
+    function buildGitLogPanel() {
+        if (gitLogBuilt) return;
+        gitLogBuilt = true;
+        document.getElementById("bpanel-gitlog").innerHTML =
+            '<div class="bsection">branch: main</div>' +
+            GIT_LOG.map(function (c) {
+                return '<div class="brow"><span class="bhash">' + escapeHtml(c.h) + "</span>"
+                    + '<span class="btext">' + escapeHtml(c.s) + "</span>"
+                    + '<span class="bdate">' + escapeHtml(c.d) + "</span></div>";
+            }).join("");
+    }
+
+    // ---- TODO panel (parsed live from the rendered TODO.md fragment) ----
+    var todoBuilt = false;
+    function buildTodoPanel() {
+        if (todoBuilt) return;
+        todoBuilt = true;
+        var host = document.getElementById("bpanel-todo");
+        host.innerHTML = '<div class="bpanel-empty">Parsing TODO.md…</div>';
+        fetch("content?path=" + encodeURIComponent("TODO.md"), { headers: { "X-Requested-With": "fetch" } })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(function (html) {
+                var tmp = document.createElement("div");
+                tmp.innerHTML = html;
+                var nodes = tmp.querySelectorAll("h2, ul.todo > li");
+                var out = "", open = 0;
+                for (var i = 0; i < nodes.length; i++) {
+                    var n = nodes[i];
+                    if (n.tagName === "H2") {
+                        out += '<div class="bsection">' + escapeHtml((n.textContent || "").trim()) + "</div>";
+                    } else {
+                        var txt = (n.textContent || "").replace(/\s+/g, " ").replace(/^\[\s*\]\s*/, "").trim();
+                        out += '<div class="brow" data-open="TODO.md"><span class="bmark">[ ]</span>'
+                            + '<span class="btext">' + escapeHtml(txt) + "</span></div>";
+                        open++;
+                    }
+                }
+                host.innerHTML = open ? out : '<div class="bpanel-empty">TODO.md has no open items.</div>';
+            })
+            .catch(function () {
+                host.innerHTML = '<div class="bpanel-empty">Could not read TODO.md.</div>';
+            });
+    }
+
+    function setBottomTab(name) {
+        if (BOTTOM_TABS.indexOf(name) === -1) name = "terminal";
+        bottomTab = name;
+        var tabs = bottomTabsEl.querySelectorAll(".bottom-tab");
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle("active", tabs[i].dataset.btab === name);
+        var panels = bottomBodyEl.querySelectorAll(".bpanel");
+        for (var j = 0; j < panels.length; j++) panels[j].hidden = panels[j].dataset.bpanel !== name;
+        try { localStorage.setItem(LS.bottomTab, name); } catch (e) {}
+        if (name === "terminal") { termBanner(); termInput.focus(); termScroll(); }
+        else if (name === "todo") buildTodoPanel();
+        else if (name === "gitlog") buildGitLogPanel();
+    }
+
     function setTermOpen(open) {
         termPanel.hidden = !open;
         stripeTerminal.classList.toggle("active", open);
         try { localStorage.setItem(LS.term, open ? "1" : "0"); } catch (e) {}
-        if (open) {
-            termBanner();
-            termInput.focus();
-            termScroll();
-        }
+        if (open) setBottomTab(bottomTab);
     }
 
-    stripeTerminal.addEventListener("click", function () { setTermOpen(termPanel.hidden); });
+    stripeTerminal.addEventListener("click", function () {
+        if (!termPanel.hidden && bottomTab === "terminal") setTermOpen(false);
+        else { bottomTab = "terminal"; setTermOpen(true); }
+    });
+    bottomTabsEl.addEventListener("click", function (e) {
+        var b = e.target.closest(".bottom-tab");
+        if (b) setBottomTab(b.dataset.btab);
+    });
+    bottomBodyEl.addEventListener("click", function (e) {
+        var row = e.target.closest("[data-open]");
+        if (row) openFile(row.getAttribute("data-open"));
+    });
     document.getElementById("bottom-close").addEventListener("click", function () { setTermOpen(false); });
 
     termEl.addEventListener("mousedown", function (e) {
@@ -1410,7 +1481,8 @@
             toggleLeft("structure");
         } else if (e.altKey && e.key === "F12") {
             e.preventDefault();
-            setTermOpen(termPanel.hidden);
+            if (!termPanel.hidden && bottomTab === "terminal") setTermOpen(false);
+            else { bottomTab = "terminal"; setTermOpen(true); }
         } else if (mod && e.shiftKey && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
             if (!state.tabs.length) return;
             e.preventDefault();
@@ -1444,6 +1516,10 @@
         var storedTermH = null;
         try { storedTermH = localStorage.getItem(LS.termH); } catch (e) {}
         if (storedTermH) document.documentElement.style.setProperty("--bottom-h", storedTermH);
+
+        var storedBTab = null;
+        try { storedBTab = localStorage.getItem(LS.bottomTab); } catch (e) {}
+        if (storedBTab && BOTTOM_TABS.indexOf(storedBTab) !== -1) bottomTab = storedBTab;
 
         var termOpen = null;
         try { termOpen = localStorage.getItem(LS.term); } catch (e) {}
