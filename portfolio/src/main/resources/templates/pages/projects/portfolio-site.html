@@ -11,10 +11,12 @@
 
     <h2>Stack</h2>
     <ul>
-        <li><strong>Spring Boot 3.5</strong> / Java 21, built with Maven.</li>
+        <li><strong>Spring Boot 4.1</strong> / Java 21, built with Maven.</li>
         <li><strong>Thymeleaf</strong> with the layout dialect for the non-IDE surfaces.</li>
         <li>A hand-rolled <strong>vanilla JavaScript</strong> shell &mdash; no framework, no jQuery.</li>
         <li>One CSS file approximating the IntelliJ "New UI" dark theme.</li>
+        <li>Deployed to <strong>Google Cloud Run</strong> from a multi-stage <code>Dockerfile</code>,
+            scale-to-zero.</li>
     </ul>
 
     <h2>Features</h2>
@@ -41,6 +43,11 @@
             focus, and the editor / build / cloud / shell tools behind the day&#8209;to&#8209;day.</li>
         <li><strong>Tagged experience</strong> &mdash; each role and the education entry carry a dated header
             and a row of tech tags, so <code>Experience.md</code> scans at a glance.</li>
+        <li><strong>Contact form</strong> &mdash; <code>Contact.md</code> validates and composes a pre&#8209;filled
+            <code>mailto:</code> (no mail backend), with a &ldquo;copy the message&rdquo; fallback.</li>
+        <li><strong>Hash routing</strong> &mdash; every file is deep&#8209;linkable as
+            <code>#/Experience.md</code>; browser back/forward walk your open history, and old
+            <code>?file=</code> links migrate themselves on load.</li>
         <li><strong>Structure view</strong> &mdash; the left dock switches (<kbd>Alt</kbd>+<kbd>7</kbd>) to an
             outline of the open file&rsquo;s headings; click one to jump to it.</li>
         <li><strong>Settings dialog</strong> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>) &mdash; switch theme
@@ -71,9 +78,8 @@
         <li><strong>Resume.pdf</strong> &mdash; a tree entry that opens an embedded document viewer (an iframe
             onto a standalone <code>/resume</code> page built from the resume fragment), with
             <em>Print / Save as PDF</em> and <em>Open in new tab</em>.</li>
-        <li><strong>Persistent layout</strong> &mdash; open tabs, the active file, tree state, panel sizes and
-            the terminal all survive a refresh; every file is deep&#8209;linkable with a
-            <code>#/Experience.md</code> hash, and browser back/forward walk your open history.</li>
+        <li><strong>Persistent layout</strong> &mdash; open tabs and their order, the active file, tree state,
+            panel sizes, theme and the terminal all survive a refresh (all in <code>localStorage</code>).</li>
         <li><strong>SEO</strong> &mdash; Open Graph / Twitter&#8209;card meta, a canonical link, and
             <code>robots.txt</code> / <code>sitemap.xml</code> served off the live host. The
             <code>/og.png</code> share card is drawn on the fly with Java 2D &mdash; no static asset.</li>
@@ -89,12 +95,17 @@
             <code>?file=</code> links migrated on load.</li>
         <li>Tabs drag to reorder, close on middle-click or <code>Ctrl/Cmd+W</code>, and the gutter line
             numbers are generated to match content height.</li>
+        <li>Crawler surfaces are their own routes: <code>/resume</code> (standalone, printable),
+            <code>/robots.txt</code>, <code>/sitemap.xml</code>, and <code>/og.png</code> &mdash; a
+            1200&times;630 card rendered with Java 2D and cached.</li>
     </ul>
 
     <h2>Ideas still on the list</h2>
     <ul>
         <li>Split editor &mdash; drag a tab to the side to open a second pane (the tab menu&rsquo;s
             &ldquo;Split Right&rdquo; is stubbed for it).</li>
+        <li>Find in file (<code>Ctrl+F</code>), keyboard navigation for the tree, and a copy button on
+            code blocks.</li>
     </ul>
     <p>The full backlog lives in <code>TODO.md</code> at the project root.</p>
 

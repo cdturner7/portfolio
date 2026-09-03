@@ -16,8 +16,21 @@ rule: when asked to "do the next thing", take the top unchecked item under "Next
     </p>
 
     <h2>Next up</h2>
-    <p><em>Queue is clear &mdash; promote the next item from <strong>Content</strong> or
-        <strong>Polish</strong> below.</em></p>
+    <ul class="todo">
+        <li><code>[ ]</code> <strong>Split editor</strong> &mdash; drag a tab to the right edge to open a
+            second pane; wire up the tab menu&rsquo;s stubbed &ldquo;Split Right&rdquo;.</li>
+        <li><code>[ ]</code> <strong>Find in file (<code>Ctrl+F</code>)</strong> &mdash; incremental search
+            within the open document, match highlight, next/prev, hit count.</li>
+        <li><code>[ ]</code> <strong>Tree keyboard navigation</strong> &mdash; arrow keys move the selection,
+            <kbd>&rarr;</kbd>/<kbd>&larr;</kbd> expand/collapse, <kbd>&#8629;</kbd> opens, plus type&#8209;ahead.</li>
+        <li><code>[ ]</code> <strong>Copy button on code blocks</strong> &mdash; a hover affordance on
+            <code>&lt;pre&gt;</code> that copies the snippet.</li>
+        <li><code>[ ]</code> <strong>Real Problems panel</strong> &mdash; make the bottom &ldquo;Problems&rdquo;
+            tab surface something: unchecked TODO items, dead internal links, stray <code>?file=</code> refs.</li>
+        <li><code>[ ]</code> <strong>Smoke tests</strong> &mdash; <code>spring-boot-starter-test</code> is a
+            dependency with nothing using it; add MockMvc checks for <code>/</code>, <code>/content</code>,
+            <code>/resume</code>, <code>/sitemap.xml</code>, <code>/og.png</code>.</li>
+    </ul>
 
     <h2>Content</h2>
     <ul class="todo">
@@ -35,6 +48,12 @@ rule: when asked to "do the next thing", take the top unchecked item under "Next
         <li><code>[ ]</code> <strong>Analytics</strong> &mdash; privacy&#8209;friendly (e.g. Plausible).</li>
         <li><code>[ ]</code> <strong>Accessibility</strong> &mdash; keyboard nav for the tree, ARIA roles,
             visible focus rings, <code>prefers-reduced-motion</code>.</li>
+        <li><code>[ ]</code> <strong>Default theme from the OS</strong> &mdash; honour
+            <code>prefers-color-scheme</code> on the first visit instead of always starting in Darcula.</li>
+        <li><code>[ ]</code> <strong>Offline shell</strong> &mdash; a small service worker so a repeat visit
+            paints instantly and survives a dropped connection.</li>
+        <li><code>[ ]</code> <strong>Per-page share cards</strong> &mdash; let <code>/og.png</code> take a
+            <code>?for=</code> so a shared deep link previews with that file&rsquo;s title.</li>
     </ul>
 
     <blockquote>Shipped items live in <code>Projects/portfolio-site.md</code> under <strong>Features</strong>.</blockquote>
