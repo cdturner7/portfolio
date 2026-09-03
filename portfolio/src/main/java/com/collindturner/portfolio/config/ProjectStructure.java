@@ -32,6 +32,7 @@ public class ProjectStructure {
         root.add(ProjectNode.file("About.md", "About.md", "md", "Markdown", "pages/about :: content"));
         root.add(ProjectNode.file("Experience.md", "Experience.md", "md", "Markdown", "pages/experience :: content"));
         root.add(ProjectNode.file("Education.md", "Education.md", "md", "Markdown", "pages/education :: content"));
+        root.add(ProjectNode.file("Now.md", "Now.md", "md", "Markdown", "pages/now :: content"));
         root.add(ProjectNode.file("Resume.pdf", "Resume.pdf", "pdf", "PDF", "pages/resume :: content"));
         root.add(ProjectNode.file("Skills.json", "Skills.json", "json", "JSON", "pages/skills :: content"));
         root.add(ProjectNode.file("dependencies.json", "dependencies.json", "json", "JSON",
