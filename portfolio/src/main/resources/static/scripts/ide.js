@@ -26,7 +26,9 @@
         fontSize: "ide.fontSize",
         lineHeight: "ide.lineHeight",
         presentation: "ide.presentation",
-        recent: "ide.recentFiles"
+        recent: "ide.recentFiles",
+        splitPath: "ide.splitPath",
+        splitWidth: "ide.splitWidth"
     };
 
     // editor look, adjustable in the Settings dialog
@@ -41,6 +43,15 @@
     var welcome = document.getElementById("welcome-screen");
     var gutter = document.getElementById("gutter");
     var editorContent = document.getElementById("editor-content");
+    var editorBody = document.getElementById("editor-body");
+    var splitDropzone = document.getElementById("split-dropzone");
+    var splitResizer = document.getElementById("editor-split-resizer");
+    var splitPane = document.getElementById("editor-split");
+    var splitIconEl = document.getElementById("split-icon");
+    var splitTitleEl = document.getElementById("split-title");
+    var splitCloseBtn = document.getElementById("split-close");
+    var splitGutter = document.getElementById("split-gutter");
+    var splitPanesHost = document.getElementById("split-panes");
     var caretLineEl = document.getElementById("caret-line");
     var stCaret = document.getElementById("st-caret");
     var projectPanel = document.getElementById("ide-project");
@@ -362,6 +373,36 @@
         return paneHost.querySelector('[data-pane="' + path.replace(/"/g, '\\"') + '"]');
     }
 
+    // Raw content HTML is the same regardless of which pane displays it (primary
+    // or the split), so it's fetched once per path and reused across panes.
+    var htmlCache = {};
+    function loadPaneContent(path, pane, onReady) {
+        if (htmlCache[path] !== undefined) {
+            pane.innerHTML = htmlCache[path];
+            highlightCode(pane);
+            enhancePdfPane(pane);
+            renderJsonPane(pane);
+            if (onReady) onReady(pane);
+            return;
+        }
+        fetch("content?path=" + encodeURIComponent(path), { headers: { "X-Requested-With": "fetch" } })
+            .then(function (r) {
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                return r.text();
+            })
+            .then(function (html) {
+                htmlCache[path] = html;
+                pane.innerHTML = html;
+                highlightCode(pane);
+                enhancePdfPane(pane);
+                renderJsonPane(pane);
+                if (onReady) onReady(pane);
+            })
+            .catch(function () {
+                pane.innerHTML = '<div class="doc-error">Could not load "' + path + '".</div>';
+            });
+    }
+
     function showPane(path) {
         welcome.hidden = true;
         gutter.classList.remove("hidden");
@@ -379,26 +420,14 @@
         pane.hidden = false;
 
         if (!contentLoaded[path]) {
-            fetch("content?path=" + encodeURIComponent(path), { headers: { "X-Requested-With": "fetch" } })
-                .then(function (r) {
-                    if (!r.ok) throw new Error("HTTP " + r.status);
-                    return r.text();
-                })
-                .then(function (html) {
-                    contentLoaded[path] = true;
-                    pane.innerHTML = html;
-                    highlightCode(pane);
-                    enhancePdfPane(pane);
-                    renderJsonPane(pane);
-                    if (state.active === path) {
-                        gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview, .jsonview"));
-                        updateGutter();
-                        refreshStructureIfVisible();
-                    }
-                })
-                .catch(function () {
-                    pane.innerHTML = '<div class="doc-error">Could not load "' + path + '".</div>';
-                });
+            loadPaneContent(path, pane, function () {
+                contentLoaded[path] = true;
+                if (state.active === path) {
+                    gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview, .jsonview"));
+                    updateGutter();
+                    refreshStructureIfVisible();
+                }
+            });
         } else {
             gutter.classList.toggle("hidden", !!pane.querySelector(".pdfview, .jsonview"));
             updateGutter();
@@ -863,23 +892,152 @@
             { label: "Copy Name", run: function () { copyAndToast(meta.name || path); } },
             { label: "Copy Link", run: function () { copyAndToast(fileLink(path)); } },
             { sep: true },
-            { label: "Split Right", disabled: true }
+            { label: "Split Right", run: function () { openSplit(path); } }
         ]);
     });
 
+    // ------------------------------------------------------------- split editor
+    // A second, lighter-weight pane to the right of the main editor. Opened by
+    // dragging a tab onto the drop zone at the right edge (which moves it out
+    // of the main tab bar) or via the tab menu's "Split Right" (which clones
+    // it, leaving the original tab in place) — mirrors IntelliJ's split editors.
+    var split = { path: null };
+    var splitLoaded = {};
+
+    function paneForSplit(path) {
+        return splitPanesHost.querySelector('[data-pane="' + path.replace(/"/g, '\\"') + '"]');
+    }
+
+    function renderSplitHeader() {
+        var meta = fileIndex[split.path];
+        splitIconEl.className = "tree-icon icon-" + (meta ? meta.icon : "txt");
+        splitTitleEl.textContent = meta ? meta.name : "";
+    }
+
+    function showSplitPane(path) {
+        var kids = splitPanesHost.children;
+        for (var i = 0; i < kids.length; i++) kids[i].hidden = true;
+
+        var pane = paneForSplit(path);
+        if (!pane) {
+            pane = document.createElement("div");
+            pane.className = "editor-doc";
+            pane.dataset.pane = path;
+            pane.innerHTML = '<div class="doc-loading">Loading&hellip;</div>';
+            splitPanesHost.appendChild(pane);
+        }
+        pane.hidden = false;
+
+        if (!splitLoaded[path]) {
+            loadPaneContent(path, pane, function () {
+                splitLoaded[path] = true;
+                if (split.path === path) {
+                    splitGutter.classList.toggle("hidden", !!pane.querySelector(".pdfview, .jsonview"));
+                    updateGutterFor(splitPanesHost, splitGutter);
+                }
+            });
+        } else {
+            splitGutter.classList.toggle("hidden", !!pane.querySelector(".pdfview, .jsonview"));
+            updateGutterFor(splitPanesHost, splitGutter);
+        }
+    }
+
+    function saveSplitState() {
+        try { localStorage.setItem(LS.splitPath, split.path || ""); } catch (e) {}
+    }
+
+    function openSplit(path) {
+        if (!fileIndex[path]) return;
+        if (isNarrow()) { toast("Split view unavailable", "Not enough room on this screen size."); return; }
+        split.path = path;
+        splitPane.hidden = false;
+        splitResizer.hidden = false;
+        renderSplitHeader();
+        showSplitPane(path);
+        saveSplitState();
+    }
+
+    function closeSplit() {
+        if (!split.path) return;
+        split.path = null;
+        splitPane.hidden = true;
+        splitResizer.hidden = true;
+        splitPanesHost.innerHTML = "";
+        splitLoaded = {};
+        saveSplitState();
+    }
+
+    splitCloseBtn.addEventListener("click", closeSplit);
+
+    // dragging a tab: flag the body so the drop zone can accept pointer events.
+    // Cleanup also runs directly from the drop handler below rather than relying
+    // solely on "dragend" — a drop that closes the source tab (moving it into the
+    // split) rebuilds the tab bar, detaching the dragged node before "dragend" is
+    // dispatched, so that event would otherwise never reach this listener.
+    function endTabDrag() {
+        document.body.classList.remove("tab-dragging");
+        splitDropzone.classList.remove("drag-hover");
+        dragPath = null;
+    }
+    tabBar.addEventListener("dragstart", function (e) {
+        if (e.target.closest(".tab")) document.body.classList.add("tab-dragging");
+    });
+    tabBar.addEventListener("dragend", endTabDrag);
+    splitDropzone.addEventListener("dragover", function (e) {
+        if (dragPath == null) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        splitDropzone.classList.add("drag-hover");
+    });
+    splitDropzone.addEventListener("dragleave", function () {
+        splitDropzone.classList.remove("drag-hover");
+    });
+    splitDropzone.addEventListener("drop", function (e) {
+        if (dragPath == null) return;
+        e.preventDefault();
+        var path = dragPath;
+        endTabDrag();
+        closeTab(path);
+        openSplit(path);
+    });
+
+    // split resizer
+    var splitResizing = false;
+    splitResizer.addEventListener("pointerdown", function (e) {
+        splitResizing = true;
+        splitResizer.classList.add("dragging");
+        splitResizer.setPointerCapture(e.pointerId);
+    });
+    splitResizer.addEventListener("pointermove", function (e) {
+        if (!splitResizing) return;
+        var right = editorBody.getBoundingClientRect().right;
+        var maxW = Math.max(editorBody.clientWidth - 300, 220);
+        var w = Math.min(Math.max(right - e.clientX, 220), maxW);
+        document.documentElement.style.setProperty("--split-width", w + "px");
+    });
+    splitResizer.addEventListener("pointerup", function (e) {
+        splitResizing = false;
+        splitResizer.classList.remove("dragging");
+        splitResizer.releasePointerCapture(e.pointerId);
+        var w = getComputedStyle(document.documentElement).getPropertyValue("--split-width").trim();
+        try { localStorage.setItem(LS.splitWidth, w); } catch (err) {}
+    });
+
     // -------------------------------------------------------------- gutter
-    function updateGutter() {
-        var h = paneHost.scrollHeight;
+    function updateGutterFor(hostEl, gutterEl) {
+        var h = hostEl.scrollHeight;
         var count = Math.max(Math.ceil(h / lineHeightPx()), 40);
         var buf = "";
         for (var n = 1; n <= count; n++) buf += "<span>" + n + "</span>";
-        gutter.innerHTML = buf;
+        gutterEl.innerHTML = buf;
     }
+    function updateGutter() { updateGutterFor(paneHost, gutter); }
     var gutterTimer;
     window.addEventListener("resize", function () {
         clearTimeout(gutterTimer);
         gutterTimer = setTimeout(function () {
             if (state.active) { updateGutter(); if (caret.active) positionCaretLine(); }
+            if (split.path) updateGutterFor(splitPanesHost, splitGutter);
         }, 120);
     });
 
@@ -1095,7 +1253,8 @@
     // ------------------------------------------------------------- toolbar
     function resetLayout() {
         [LS.tabs, LS.active, LS.collapsed, LS.width, LS.panel, LS.leftView, LS.term, LS.termH,
-         LS.bottomTab, LS.theme, LS.fontSize, LS.lineHeight, LS.presentation, LS.recent].forEach(function (k) {
+         LS.bottomTab, LS.theme, LS.fontSize, LS.lineHeight, LS.presentation, LS.recent,
+         LS.splitPath, LS.splitWidth].forEach(function (k) {
             try { localStorage.removeItem(k); } catch (e) {}
         });
         window.location.href = window.location.pathname;
@@ -1672,6 +1831,7 @@
             [[KMOD, "Shift", "←"], "Previous tab"],
             [[KMOD, "Shift", "→"], "Next tab"],
             [["drag"], "Reorder tab"],
+            [["drag → edge"], "Split right"],
             [["middle-click"], "Close tab"]
         ]],
         ["Editor", [
@@ -1875,6 +2035,14 @@
         if (target) openFile(target);
         else if (!state.tabs.length) openFile(DEFAULT_FILE);
         else { renderTabs(); showWelcome(); }
+
+        var storedSplitWidth = null;
+        try { storedSplitWidth = localStorage.getItem(LS.splitWidth); } catch (e) {}
+        if (storedSplitWidth) document.documentElement.style.setProperty("--split-width", storedSplitWidth);
+
+        var storedSplitPath = null;
+        try { storedSplitPath = localStorage.getItem(LS.splitPath); } catch (e) {}
+        if (storedSplitPath && fileIndex[storedSplitPath] && !isNarrow()) openSplit(storedSplitPath);
 
         booting = false;
         startupToasts();

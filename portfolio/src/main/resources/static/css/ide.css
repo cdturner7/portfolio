@@ -60,6 +60,7 @@
     --status-h:  24px;
     --gutter-w:  52px;
     --project-width: 260px;
+    --split-width: 380px;
 }
 
 /* ---- IntelliJ Light -------------------------------------------------- */
@@ -564,9 +565,18 @@ body.project-collapsed .ide-resizer { display: none; }
     pointer-events: none;
 }
 
+/* row that holds the primary editor content and, when open, the split pane */
+.editor-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    position: relative;
+}
+
 /* editor content + gutter */
 .editor-content {
     flex: 1;
+    min-width: 0;
     min-height: 0;
     overflow: auto;
     position: relative;
@@ -603,6 +613,85 @@ body.project-collapsed .ide-resizer { display: none; }
 
 .editor-panes { position: relative; z-index: 1; margin-left: var(--gutter-w); min-height: 200px; }
 .editor-doc[hidden] { display: none; }
+
+/* ---- split editor: drag a tab to the right edge, or "Split Right" ---- */
+.split-dropzone {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 35%;
+    min-width: 140px;
+    max-width: 340px;
+    z-index: 30;
+    pointer-events: none;
+}
+body.tab-dragging .split-dropzone { pointer-events: auto; }
+body.tab-dragging .split-dropzone::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 1px dashed var(--ide-border-strong);
+    opacity: .6;
+}
+.split-dropzone::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--ide-accent);
+    opacity: 0;
+    border-left: 2px solid transparent;
+    transition: opacity .1s ease, border-color .1s ease;
+}
+.split-dropzone.drag-hover::before { opacity: .16; border-left-color: var(--ide-accent); }
+.split-dropzone.drag-hover::after { display: none; }
+
+.editor-split-resizer {
+    width: 5px;
+    flex: none;
+    cursor: col-resize;
+    z-index: 5;
+}
+.editor-split-resizer:hover, .editor-split-resizer.dragging { background: var(--ide-accent); opacity: .4; }
+.editor-split-resizer[hidden] { display: none; }
+
+.editor-split {
+    flex: none;
+    width: var(--split-width);
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    background: var(--ide-bg-editor);
+    border-left: 1px solid var(--ide-border-strong);
+}
+.editor-split[hidden] { display: none; }
+
+.split-header {
+    height: var(--tabs-h);
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 6px 0 12px;
+    background: var(--ide-bg-panel);
+    border-bottom: 1px solid var(--ide-border-strong);
+    color: var(--ide-fg);
+    font-size: 12.5px;
+}
+.split-header .tree-icon { width: 15px; height: 15px; flex: none; }
+#split-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.split-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    flex: none;
+    color: var(--ide-fg-faint);
+    font-size: 14px;
+    line-height: 1;
+}
+.split-close::before { content: "\00d7"; }
+.split-close:hover { background: var(--ide-hover); color: var(--ide-fg); }
 
 /* ---- Resume.pdf: an embedded "PDF viewer" pane ---- */
 .pdfview {
@@ -1591,6 +1680,8 @@ body.presentation .ide-stripe,
 body.presentation .ide-status,
 body.presentation .ide-project,
 body.presentation .ide-resizer,
+body.presentation .editor-split,
+body.presentation .editor-split-resizer,
 body.presentation .toast-stack { display: none; }
 body.presentation .pres-exit { display: flex; }
 
@@ -1623,6 +1714,7 @@ body.presentation .pres-exit { display: flex; }
     body.drawer-open .ide-project { transform: none; }
 
     .ide-resizer { display: none; }
+    .editor-split, .editor-split-resizer, .split-dropzone { display: none; }
 
     .drawer-scrim {
         display: block;
